@@ -1,4 +1,4 @@
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { BrandLogo } from "./BrandLogo";
@@ -7,7 +7,15 @@ import { useAuth } from "../context/AuthContext";
 export function Navbar() {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("your-choice-theme") === "dark");
   const navigate = useNavigate();
+
+  function toggleTheme() {
+    const nextDarkMode = !darkMode;
+    setDarkMode(nextDarkMode);
+    document.documentElement.dataset.theme = nextDarkMode ? "dark" : "light";
+    localStorage.setItem("your-choice-theme", nextDarkMode ? "dark" : "light");
+  }
 
   async function logout() {
     await signOut();
@@ -23,6 +31,10 @@ export function Navbar() {
         <nav className={menuOpen ? "nav-links open" : "nav-links"}>
           <NavLink to="/courses" onClick={() => setMenuOpen(false)}>Courses</NavLink>
           <a href="/#roadmap" onClick={() => setMenuOpen(false)}>How it works</a>
+          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${darkMode ? "light" : "dark"} mode`} title={`Switch to ${darkMode ? "light" : "dark"} mode`}>
+            {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+            <span>{darkMode ? "Light mode" : "Dark mode"}</span>
+          </button>
           {user ? (
             <>
               <NavLink to={user.role === "ADMIN" ? "/admin" : "/dashboard"} onClick={() => setMenuOpen(false)}>{user.role === "ADMIN" ? "Admin" : "My learning"}</NavLink>

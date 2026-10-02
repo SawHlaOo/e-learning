@@ -30,6 +30,50 @@
 .learning-board-header .eyebrow{font-size:8px}
 .learning-board-header strong{font-size:17px;letter-spacing:-.45px}
 .learning-board-sparkle{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#eef4ff;color:#2446e8}
+
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font-size:12px;font-weight:600}
+.theme-toggle:hover{background:var(--paper)}
+.enrollment-disabled,.enrollment-disabled:hover{pointer-events:none;cursor:not-allowed;opacity:.58;transform:none}
+
+:root[data-theme="dark"]{color-scheme:dark;--ink:#e5ece6;--muted:#a0ada3;--line:#344239;--paper:#151d18;color:var(--ink);background:var(--paper)}
+:root[data-theme="dark"] body{background:var(--paper);color:var(--ink)}
+:root[data-theme="dark"] .navbar{background:#151d18ed;border-color:#303c33}
+:root[data-theme="dark"] .nav-links{color:#c0cbc2}
+:root[data-theme="dark"] .nav-links a:hover,:root[data-theme="dark"] .nav-links .active{color:#f0f5f1}
+:root[data-theme="dark"] .nav-cta,:root[data-theme="dark"] .button-dark{background:#b9ee78;color:#17231e}
+:root[data-theme="dark"] .nav-cta:hover,:root[data-theme="dark"] .button-dark:hover{background:#a4dc62}
+:root[data-theme="dark"] .hero{background:radial-gradient(ellipse at 83% 38%,#263524 0%,transparent 38%),#151d18}
+:root[data-theme="dark"] .hero-description,:root[data-theme="dark"] .section-heading>p,:root[data-theme="dark"] .hero-proof,:root[data-theme="dark"] .scroll-cue,:root[data-theme="dark"] .content-intro,:root[data-theme="dark"] .course-detail-header p,:root[data-theme="dark"] .lesson-heading p{color:#a9b5ab}
+:root[data-theme="dark"] .pill,:root[data-theme="dark"] .float-note{background:#202b23;border-color:#3a493d;color:#d3ddd4}
+:root[data-theme="dark"] .hero-proof strong,:root[data-theme="dark"] .note-bottom strong,:root[data-theme="dark"] .learning-card-copy strong{color:#e5ece6}
+:root[data-theme="dark"] .step-card,:root[data-theme="dark"] .course-card,:root[data-theme="dark"] .learning-board,:root[data-theme="dark"] .module-panel,:root[data-theme="dark"] .dashboard-stats>div,:root[data-theme="dark"] .auth-card{background:#1c261f;border-color:#344239;color:#e5ece6}
+:root[data-theme="dark"] .learning-card{border-color:#344239}
+:root[data-theme="dark"] .learning-board-footer,:root[data-theme="dark"] .dashboard-panel{background:#263426;color:#e5ece6}
+:root[data-theme="dark"] .learning-board-footer strong,:root[data-theme="dark"] .dashboard-stats strong{color:#e5ece6}
+:root[data-theme="dark"] .content-page h1,:root[data-theme="dark"] .section-heading h2,:root[data-theme="dark"] .step-card h3,:root[data-theme="dark"] .course-card h3,:root[data-theme="dark"] .curriculum>h2,:root[data-theme="dark"] .module-panel h3,:root[data-theme="dark"] .dashboard-panel h2,:root[data-theme="dark"] .auth-card h1{color:#edf3ee}
+:root[data-theme="dark"] .page-state,:root[data-theme="dark"] .step-card p,:root[data-theme="dark"] .muted,:root[data-theme="dark"] .lesson-content,:root[data-theme="dark"] .back-link,:root[data-theme="dark"] .lesson-row,:root[data-theme="dark"] .course-meta,:root[data-theme="dark"] .auth-card>p,:root[data-theme="dark"] .auth-switch{color:#a5b1a7}
+:root[data-theme="dark"] .page-state strong{color:#e5ece6}
+:root[data-theme="dark"] .lesson-row{border-color:#344239}
+:root[data-theme="dark"] .button-light{background:#202b23;border-color:#3a493d;color:#e5ece6}
+:root[data-theme="dark"] .auth-page{background:radial-gradient(ellipse at 50% 20%,#263524,transparent 42%),#151d18}
+:root[data-theme="dark"] .field{color:#d4ded5}
+:root[data-theme="dark"] .input-wrap{border-color:#3b493f;color:#a5b1a7}
+:root[data-theme="dark"] .input-wrap input{color:#e5ece6}
+:root[data-theme="dark"] .input-wrap input::placeholder{color:#78857b}
+:root[data-theme="dark"] .auth-switch a,:root[data-theme="dark"] .text-link,:root[data-theme="dark"] .back-link:hover{color:#b9ee78}
+:root[data-theme="dark"] .footer{border-color:#344239;color:#a5b1a7}
+:root[data-theme="dark"] .footer-socials a,:root[data-theme="dark"] .footer-socials button{color:#c0cbc2}
+:root[data-theme="dark"] .footer-socials a:hover{background:#b9ee78;border-color:#b9ee78;color:#17231e}
+:root[data-theme="dark"] .theme-toggle{border-color:#435247;color:#dce6dd}
+:root[data-theme="dark"] .theme-toggle:hover{background:#263229}
+:root[data-theme="dark"] .video-placeholder{background:#0e1511}
+:root[data-theme="dark"] .course-art-label{color:#d0ddc6}
+:root[data-theme="dark"] .menu-toggle{color:#e5ece6}
+:root[data-theme="dark"] .brand-logo-name{color:#e5ece6}
+:root[data-theme="dark"] .nav-links.open{background:#151d18;border-color:#344239}
+:root[data-theme="dark"] .content-page h1 span,:root[data-theme="dark"] .hero h1 span,:root[data-theme="dark"] .section-heading h2 span{color:#b9ee78}
+
+@media(max-width:650px){.theme-toggle{justify-content:flex-start;border:0;padding:12px 8px}.theme-toggle:hover{background:transparent}}
 .learning-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .learning-card{min-height:76px;display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #edf0ed;border-radius:11px}
 .learning-card-icon{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:10px;background:#edf5e4;color:#5f833e}
