@@ -27,14 +27,9 @@ export function Navbar() {
     <header className="navbar">
       <div className="nav-inner">
         <Link className="brand brand-logo" to="/" aria-label="Your Choice Tech home" onClick={() => setMenuOpen(false)}><BrandLogo /></Link>
-        <button className="menu-toggle" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         <nav className={menuOpen ? "nav-links open" : "nav-links"}>
           <NavLink to="/courses" onClick={() => setMenuOpen(false)}>Courses</NavLink>
           <a href="/#roadmap" onClick={() => setMenuOpen(false)}>How it works</a>
-          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${darkMode ? "light" : "dark"} mode`} title={`Switch to ${darkMode ? "light" : "dark"} mode`}>
-            {darkMode ? <Sun size={17} /> : <Moon size={17} />}
-            <span>{darkMode ? "Light mode" : "Dark mode"}</span>
-          </button>
           {user ? (
             <>
               <NavLink to={user.role === "ADMIN" ? "/admin" : "/dashboard"} onClick={() => setMenuOpen(false)}>{user.role === "ADMIN" ? "Admin" : "My learning"}</NavLink>
@@ -47,6 +42,13 @@ export function Navbar() {
             </>
           )}
         </nav>
+        <div className="nav-controls">
+          <button className="menu-toggle" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
+          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${darkMode ? "light" : "dark"} mode`} title={`Switch to ${darkMode ? "light" : "dark"} mode`}>
+            {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+            <span>{darkMode ? "Light mode" : "Dark mode"}</span>
+          </button>
+        </div>
       </div>
     </header>
   );
