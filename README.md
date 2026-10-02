@@ -154,9 +154,9 @@ Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. 
 ## Vercel deployment
 
 1. Push the repository to GitHub.
-2. Import the repository in Vercel as a single project. Keep the project root at the repository root.
+2. Import the repository in Vercel as a single project. Set **Root Directory** to the repository root (not `backend/` or `frontend/`). Do not override the Build Command or Output Directory in the project settings; the checked-in `vercel.json` runs `npm run vercel-build` and serves `frontend/dist`.
 3. In **Vercel → Project → Settings → Environment Variables**, configure `DATABASE_URL` with the Neon PostgreSQL connection string, `JWT_SECRET` with a strong random secret, `CLIENT_URL` with the exact production domain (for example `https://my-python-course.vercel.app`), and `NODE_ENV=production`. Apply the variables to the intended Production/Preview/Development environments as appropriate. Do not commit the actual values.
-4. Deploy. `npm run build` delegates to the backend and frontend workspace build scripts. It generates Prisma Client and builds both apps without attempting a database connection.
+4. Deploy. Vercel runs `npm run vercel-build`: it generates Prisma Client, type-checks the backend, and builds the Vite frontend into `frontend/dist`. These build steps do not connect to PostgreSQL.
 5. Open `https://YOUR-VERCEL-DOMAIN.vercel.app/api/health`.
 6. Apply the checked-in database migrations to Neon using `npm run prisma:migrate` with `DATABASE_URL` configured for that database. The development seed refuses to run with `NODE_ENV=production`; do not seed the production database.
 7. Register/login, browse a published course, and verify that a non-admin is denied `/api/admin/*` and `/admin`.
