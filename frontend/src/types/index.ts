@@ -18,6 +18,7 @@ export interface Course {
   thumbnail?: string | null;
   featured?: boolean;
   published?: boolean;
+  telegramEnrollmentEnabled?: boolean;
   estimatedHours?: number;
   _count?: { modules: number; enrollments: number };
   modules?: Module[];

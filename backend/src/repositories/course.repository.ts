@@ -13,6 +13,7 @@ export class CourseRepository {
         select: {
           id: true, title: true, slug: true, summary: true, description: true,
           level: true, thumbnail: true, featured: true, estimatedHours: true,
+          telegramEnrollmentEnabled: true,
           _count: { select: { modules: true, enrollments: true } },
         },
         orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
@@ -35,6 +36,7 @@ export class CourseRepository {
         thumbnail: true,
         published: true,
         featured: true,
+        telegramEnrollmentEnabled: true,
         estimatedHours: true,
         modules: {
           orderBy: { order: "asc" },

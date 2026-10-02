@@ -15,6 +15,7 @@ export const createCourseBodySchema = z.object({
   thumbnail: thumbnailUrlSchema,
   published: z.boolean().optional(),
   featured: z.boolean().optional(),
+  telegramEnrollmentEnabled: z.boolean().optional(),
   estimatedHours: z.number().int().min(0).max(10000).optional(),
 });
 

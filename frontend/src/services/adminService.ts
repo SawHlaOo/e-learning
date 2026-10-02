@@ -1,7 +1,7 @@
 import { api, apiData } from "./api";
 import type { Course, Lesson, Module } from "../types";
 
-export type CourseAdminSummary = Pick<Course, "id" | "title" | "slug" | "level" | "published" | "_count"> & {
+export type CourseAdminSummary = Pick<Course, "id" | "title" | "slug" | "level" | "published" | "telegramEnrollmentEnabled" | "_count"> & {
   createdAt: string;
 };
 export type ManagedLesson = Omit<Lesson, "order" | "published"> & { order: number; published: boolean };

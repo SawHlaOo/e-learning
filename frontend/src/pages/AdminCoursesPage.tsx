@@ -18,6 +18,7 @@ const emptyCourse: CourseInput = {
   estimatedHours: 0,
   published: false,
   featured: false,
+  telegramEnrollmentEnabled: true,
 };
 
 const emptyModule = { title: "", description: "", order: 1 };
@@ -79,6 +80,7 @@ export function AdminCoursesPage() {
       estimatedHours: course.estimatedHours ?? 0,
       published: course.published ?? false,
       featured: course.featured ?? false,
+      telegramEnrollmentEnabled: course.telegramEnrollmentEnabled ?? true,
     });
     setThumbnailImageFailed(false);
     setModuleDraft({ ...emptyModule, order: nextOrder(course.modules) });
@@ -342,6 +344,7 @@ export function AdminCoursesPage() {
             <div className="admin-checkboxes">
               <label><input type="checkbox" checked={courseDraft.published} onChange={(event) => courseField("published", event.target.checked)} /> Published</label>
               <label><input type="checkbox" checked={courseDraft.featured} onChange={(event) => courseField("featured", event.target.checked)} /> Featured on homepage</label>
+              <label><input type="checkbox" checked={courseDraft.telegramEnrollmentEnabled} onChange={(event) => courseField("telegramEnrollmentEnabled", event.target.checked)} /> Telegram enrollment button active</label>
             </div>
             <button className="button button-dark" type="submit" disabled={saving}><Save size={15} /> {saving ? "Saving…" : "Save course"}</button>
           </form>

@@ -25,4 +25,5 @@ export interface CourseInput {
   estimatedHours: number;
   published: boolean;
   featured: boolean;
+  telegramEnrollmentEnabled: boolean;
 }

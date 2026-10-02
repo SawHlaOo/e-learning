@@ -49,7 +49,7 @@ export class AdminRepository {
         skip: (page.page - 1) * page.limit,
         take: page.limit,
         select: {
-          id: true, title: true, slug: true, level: true, published: true, createdAt: true,
+          id: true, title: true, slug: true, level: true, published: true, telegramEnrollmentEnabled: true, createdAt: true,
           _count: { select: { modules: true, enrollments: true } },
         },
         orderBy: { createdAt: "desc" },

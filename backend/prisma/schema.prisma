@@ -26,22 +26,22 @@ enum EnrollmentStatus {
 }
 
 model User {
-  id                 String             @id @default(cuid())
-  name               String
-  email              String             @unique
-  passwordHash       String
-  role               Role               @default(STUDENT)
-  isActive           Boolean            @default(true)
-  createdCourses     Course[]           @relation("CourseAuthor")
-  enrollments        Enrollment[]
-  lessonProgress     LessonProgress[]
+  id                  String               @id @default(cuid())
+  name                String
+  email               String               @unique
+  passwordHash        String
+  role                Role                 @default(STUDENT)
+  isActive            Boolean              @default(true)
+  createdCourses      Course[]             @relation("CourseAuthor")
+  enrollments         Enrollment[]
+  lessonProgress      LessonProgress[]
   exerciseSubmissions ExerciseSubmission[]
-  quizAttempts       QuizAttempt[]
-  youtubeVideos      YouTubeVideo[]
-  userAchievements   UserAchievement[]
-  certificates       Certificate[]
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  quizAttempts        QuizAttempt[]
+  youtubeVideos       YouTubeVideo[]
+  userAchievements    UserAchievement[]
+  certificates        Certificate[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   @@index([role, isActive])
   @@index([role, createdAt])
@@ -49,24 +49,25 @@ model User {
 }
 
 model Course {
-  id             String        @id @default(cuid())
-  title          String
-  slug           String        @unique
-  description    String        @db.Text
-  summary        String        @default("")
-  level          Difficulty    @default(EASY)
-  thumbnail      String?
-  published      Boolean       @default(false)
-  featured       Boolean       @default(false)
-  estimatedHours Int           @default(0)
-  authorId       String
-  author         User          @relation("CourseAuthor", fields: [authorId], references: [id], onDelete: Restrict)
-  modules        Module[]
-  enrollments    Enrollment[]
-  certificates   Certificate[]
-  projects       Project[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id                        String        @id @default(cuid())
+  title                     String
+  slug                      String        @unique
+  description               String        @db.Text
+  summary                   String        @default("")
+  level                     Difficulty    @default(EASY)
+  thumbnail                 String?
+  published                 Boolean       @default(false)
+  featured                  Boolean       @default(false)
+  telegramEnrollmentEnabled Boolean       @default(true)
+  estimatedHours            Int           @default(0)
+  authorId                  String
+  author                    User          @relation("CourseAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  modules                   Module[]
+  enrollments               Enrollment[]
+  certificates              Certificate[]
+  projects                  Project[]
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
 
   @@index([published, featured, createdAt])
   @@index([authorId])
@@ -88,22 +89,22 @@ model Module {
 }
 
 model Lesson {
-  id             String           @id @default(cuid())
-  title          String
-  slug           String
-  content        String           @default("") @db.Text
-  order          Int
-  published      Boolean          @default(false)
+  id              String           @id @default(cuid())
+  title           String
+  slug            String
+  content         String           @default("") @db.Text
+  order           Int
+  published       Boolean          @default(false)
   durationMinutes Int              @default(0)
-  youtubeUrl     String?
-  moduleId       String
-  module         Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress       LessonProgress[]
-  exercises      Exercise[]
-  quizzes        Quiz[]
-  youtubeVideos  YouTubeVideo[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  youtubeUrl      String?
+  moduleId        String
+  module          Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress        LessonProgress[]
+  exercises       Exercise[]
+  quizzes         Quiz[]
+  youtubeVideos   YouTubeVideo[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@unique([moduleId, order])
   @@unique([moduleId, slug])
@@ -162,15 +163,15 @@ model Exercise {
 }
 
 model ExerciseSubmission {
-  id          String   @id @default(cuid())
-  userId      String
-  exerciseId  String
-  code        String   @db.Text
-  isPassed    Boolean  @default(false)
-  feedback    String?  @db.Text
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exercise    Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  exerciseId String
+  code       String   @db.Text
+  isPassed   Boolean  @default(false)
+  feedback   String?  @db.Text
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 
   @@index([userId, exerciseId, createdAt])
 }
@@ -193,28 +194,28 @@ model Quiz {
 }
 
 model QuizQuestion {
-  id            String   @id @default(cuid())
+  id            String  @id @default(cuid())
   quizId        String
-  prompt        String   @db.Text
+  prompt        String  @db.Text
   options       Json
   correctAnswer Int
-  explanation   String?  @db.Text
+  explanation   String? @db.Text
   order         Int
-  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz          Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@unique([quizId, order])
 }
 
 model QuizAttempt {
-  id          String   @id @default(cuid())
-  userId      String
-  quizId      String
-  score       Int
-  passed      Boolean
-  answers     Json
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  quizId    String
+  score     Int
+  passed    Boolean
+  answers   Json
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 
   @@index([userId, quizId, createdAt])
 }
@@ -260,13 +261,13 @@ model YouTubeVideo {
 }
 
 model Achievement {
-  id              String           @id @default(cuid())
-  name            String           @unique
-  description     String           @db.Text
-  icon            String
-  points          Int              @default(0)
+  id               String            @id @default(cuid())
+  name             String            @unique
+  description      String            @db.Text
+  icon             String
+  points           Int               @default(0)
   userAchievements UserAchievement[]
-  createdAt       DateTime         @default(now())
+  createdAt        DateTime          @default(now())
 }
 
 model UserAchievement {
@@ -282,27 +283,27 @@ model UserAchievement {
 }
 
 model Certificate {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  userId      String
-  courseId    String
-  issuedAt    DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  id       String   @id @default(cuid())
+  code     String   @unique
+  userId   String
+  courseId String
+  issuedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
 
   @@unique([userId, courseId])
   @@index([courseId, issuedAt])
 }
 
 model CheatSheet {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  category    String
-  content     String   @db.Text
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  category  String
+  content   String   @db.Text
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category, published])
 }
