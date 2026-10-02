@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  SUSPENDED
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  name               String
+  email              String             @unique
+  passwordHash       String
+  role               Role               @default(STUDENT)
+  isActive           Boolean            @default(true)
+  createdCourses     Course[]           @relation("CourseAuthor")
+  enrollments        Enrollment[]
+  lessonProgress     LessonProgress[]
+  exerciseSubmissions ExerciseSubmission[]
+  quizAttempts       QuizAttempt[]
+  youtubeVideos      YouTubeVideo[]
+  userAchievements   UserAchievement[]
+  certificates       Certificate[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([role, isActive])
+  @@index([role, createdAt])
+  @@index([createdAt])
+}
+
+model Course {
+  id             String        @id @default(cuid())
+  title          String
+  slug           String        @unique
+  description    String        @db.Text
+  summary        String        @default("")
+  level          Difficulty    @default(EASY)
+  thumbnail      String?
+  published      Boolean       @default(false)
+  featured       Boolean       @default(false)
+  estimatedHours Int           @default(0)
+  authorId       String
+  author         User          @relation("CourseAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  modules        Module[]
+  enrollments    Enrollment[]
+  certificates   Certificate[]
+  projects       Project[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([published, featured, createdAt])
+  @@index([authorId])
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("") @db.Text
+  order       Int
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([courseId, order])
+  @@index([courseId])
+}
+
+model Lesson {
+  id             String           @id @default(cuid())
+  title          String
+  slug           String
+  content        String           @default("") @db.Text
+  order          Int
+  published      Boolean          @default(false)
+  durationMinutes Int              @default(0)
+  youtubeUrl     String?
+  moduleId       String
+  module         Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress       LessonProgress[]
+  exercises      Exercise[]
+  quizzes        Quiz[]
+  youtubeVideos  YouTubeVideo[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([moduleId, order])
+  @@unique([moduleId, slug])
+  @@index([published])
+}
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  userId      String
+  courseId    String
+  status      EnrollmentStatus @default(ACTIVE)
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId, status])
+}
+
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId, completed])
+}
+
+model Exercise {
+  id           String               @id @default(cuid())
+  title        String
+  description  String               @db.Text
+  difficulty   Difficulty           @default(EASY)
+  instructions String               @default("") @db.Text
+  starterCode  String               @default("") @db.Text
+  solution     String?              @db.Text
+  hint         String?              @db.Text
+  points       Int                  @default(20)
+  published    Boolean              @default(false)
+  lessonId     String?
+  lesson       Lesson?              @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  submissions  ExerciseSubmission[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@index([published, difficulty])
+  @@index([published, createdAt])
+  @@index([lessonId])
+}
+
+model ExerciseSubmission {
+  id          String   @id @default(cuid())
+  userId      String
+  exerciseId  String
+  code        String   @db.Text
+  isPassed    Boolean  @default(false)
+  feedback    String?  @db.Text
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise    Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, exerciseId, createdAt])
+}
+
+model Quiz {
+  id                String         @id @default(cuid())
+  title             String
+  description       String         @default("") @db.Text
+  passingPercentage Int            @default(70)
+  published         Boolean        @default(false)
+  lessonId          String?
+  lesson            Lesson?        @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  questions         QuizQuestion[]
+  attempts          QuizAttempt[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([published])
+  @@index([published, createdAt])
+}
+
+model QuizQuestion {
+  id            String   @id @default(cuid())
+  quizId        String
+  prompt        String   @db.Text
+  options       Json
+  correctAnswer Int
+  explanation   String?  @db.Text
+  order         Int
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, order])
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  score       Int
+  passed      Boolean
+  answers     Json
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, quizId, createdAt])
+}
+
+model Project {
+  id           String     @id @default(cuid())
+  title        String
+  slug         String     @unique
+  description  String     @db.Text
+  difficulty   Difficulty @default(EASY)
+  requirements Json
+  skills       Json
+  instructions String     @default("") @db.Text
+  starterCode  String?    @db.Text
+  solution     String?    @db.Text
+  published    Boolean    @default(false)
+  courseId     String?
+  course       Course?    @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([published, difficulty])
+}
+
+model YouTubeVideo {
+  id             String   @id @default(cuid())
+  title          String
+  youtubeUrl     String
+  youtubeVideoId String
+  description    String   @default("") @db.Text
+  thumbnail      String?
+  duration       Int?
+  published      Boolean  @default(false)
+  featured       Boolean  @default(false)
+  authorId       String
+  lessonId       String?
+  author         User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  lesson         Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([published, featured, createdAt])
+}
+
+model Achievement {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  description     String           @db.Text
+  icon            String
+  points          Int              @default(0)
+  userAchievements UserAchievement[]
+  createdAt       DateTime         @default(now())
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  earnedAt      DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId, earnedAt])
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  userId      String
+  courseId    String
+  issuedAt    DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, courseId])
+  @@index([courseId, issuedAt])
+}
+
+model CheatSheet {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  category    String
+  content     String   @db.Text
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category, published])
+}

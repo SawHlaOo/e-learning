@@ -1,0 +1,40 @@
+{
+  "name": "python-learning-platform-backend",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "npm run prisma:generate && tsc -p tsconfig.json && tsc -p prisma/tsconfig.json",
+    "start": "node dist/index.js",
+    "prisma:generate": "node scripts/run-with-root-env.cjs prisma generate --schema prisma/schema.prisma",
+    "prisma:migrate": "node scripts/run-with-root-env.cjs prisma migrate deploy --schema prisma/schema.prisma",
+    "prisma:migrate:dev": "node scripts/run-with-root-env.cjs prisma migrate dev --schema prisma/schema.prisma",
+    "prisma:seed": "node scripts/run-with-root-env.cjs tsx prisma/seed.ts",
+    "prisma:studio": "node scripts/run-with-root-env.cjs prisma studio --schema prisma/schema.prisma",
+    "test": "tsx --test tests/auth.service.test.ts tests/course.service.test.ts tests/learning.service.test.ts tests/pagination.test.ts tests/error-handler.test.ts tests/validate.middleware.test.ts tests/youtube-url.validator.test.ts tests/course.validator.test.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.0.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pino": "^9.9.0",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.18.6",
+    "prisma": "^6.15.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
