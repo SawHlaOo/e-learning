@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "npm run prisma:generate && tsc -p tsconfig.json && tsc -p prisma/tsconfig.json",
+    "vercel-build": "npm --prefix .. run vercel-build",
     "start": "node dist/index.js",
     "prisma:generate": "node scripts/run-with-root-env.cjs prisma generate --schema prisma/schema.prisma",
     "prisma:migrate": "node scripts/run-with-root-env.cjs prisma migrate deploy --schema prisma/schema.prisma",
