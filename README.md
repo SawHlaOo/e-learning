@@ -149,6 +149,7 @@ Client variable (optional locally; Vite proxies `/api` if unset):
 | Variable | Purpose |
 | --- | --- |
 | `VITE_API_URL` | Local API base URL, e.g. `http://localhost:5000/api`. Production uses the frontend Vercel `/api` proxy instead. |
+| `VITE_TELEGRAM_ENROLL_URL` | Public HTTPS Telegram chat URL (for example `https://t.me/your_username`) opened by the course enrollment button. Set it on the frontend Vercel project. |
 
 Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. Do not put real credentials in GitHub.
 
@@ -159,7 +160,8 @@ Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. 
 3. Add `DATABASE_URL` (Neon connection string), `JWT_SECRET` (strong random secret), `CLIENT_URL` (the exact frontend origin, e.g. `https://my-python-course.vercel.app`), and `NODE_ENV=production` to the **backend Vercel project**. Do not add `DATABASE_URL` or `JWT_SECRET` to the frontend project.
 4. Deploy the backend project and note its URL, for example `https://my-python-course-api.vercel.app`. Check `https://YOUR-API-DOMAIN.vercel.app/api/health`.
 5. Create a second Vercel project from the same repository. Set **Root Directory** to `frontend` and use **Framework Preset: Other**. The `frontend/vercel.json` builds the Vite app into `dist`, proxies `/api/*` to the backend project, and rewrites other routes to `index.html`. If the backend project URL changes, update the API rewrite destination in that file.
-6. Deploy the frontend project. Set the backend project's `CLIENT_URL` to the exact frontend origin (scheme + hostname, no path), then redeploy the backend so CORS permits the proxied request origin. The browser communicates with the frontend origin, so auth cookies remain first-party and Vercel handles the API proxy.
+6. In the frontend project's environment variables, set `VITE_TELEGRAM_ENROLL_URL` to your Telegram HTTPS chat link. This is a public client-side URL, not a secret.
+7. Deploy the frontend project. Set the backend project's `CLIENT_URL` to the exact frontend origin (scheme + hostname, no path), then redeploy the backend so CORS permits the proxied request origin. The browser communicates with the frontend origin, so auth cookies remain first-party and Vercel handles the API proxy.
 8. Apply the checked-in database migrations to Neon using `npm run prisma:migrate` with `DATABASE_URL` configured for that database. The development seed refuses to run with `NODE_ENV=production`; do not seed the production database.
 9. Register/login, browse a published course, and verify that a non-admin is denied `/api/admin/*` and `/admin`.
 

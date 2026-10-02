@@ -13,7 +13,6 @@ export const courseService = {
   create: (input: CourseInput) => apiData<Course>(api.post("/courses", input)),
   update: (id: string, input: Partial<CourseInput>) => apiData<Course>(api.put(`/courses/${id}`, input)),
   delete: (id: string) => apiData<{ id: string }>(api.delete(`/courses/${id}`)),
-  enroll: (id: string) => apiData<{ id: string; status: string }>(api.post(`/courses/${id}/enroll`)),
 };
 
 export interface CourseInput {
