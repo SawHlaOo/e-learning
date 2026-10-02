@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { BrandLogo } from "../components/BrandLogo";
 import { useAuth } from "../context/AuthContext";
 
 const schema = z.object({
@@ -46,7 +47,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
   return <main className="auth-page">
     <Link className="auth-back" to="/"><ArrowLeft size={16} /> Back to home</Link>
     <div className="auth-card">
-      <div className="auth-logo"><span className="brand-mark">Py</span></div>
+      <Link className="brand brand-logo auth-logo" to="/" aria-label="Your Choice Tech home"><BrandLogo /></Link>
       <span className="eyebrow">{register ? "YOUR NEXT CHAPTER" : "WELCOME BACK"}</span>
       <h1>{register ? "Let’s get you started." : "Good to see you again."}</h1>
       <p>{register ? "Create an account and start learning at your own pace." : "Sign in to pick up right where you left off."}</p>
@@ -57,7 +58,7 @@ export function AuthPage({ register = false }: { register?: boolean }) {
         {error && <div className="form-error" role="alert">{error}</div>}
         <button className="button button-dark auth-submit" disabled={submitting}>{submitting ? "One moment…" : register ? "Create account" : "Sign in"} <ArrowRight size={17} /></button>
       </form>
-      <div className="auth-switch">{register ? "Already have an account?" : "New to PyPath?"} <Link to={register ? "/login" : "/register"}>{register ? "Sign in" : "Create an account"}</Link></div>
+      <div className="auth-switch">{register ? "Already have an account?" : "New to Your Choice?"} <Link to={register ? "/login" : "/register"}>{register ? "Sign in" : "Create an account"}</Link></div>
     </div>
     <div className="auth-side-note"><Code2 size={17} /> A little progress, every day.</div>
   </main>;

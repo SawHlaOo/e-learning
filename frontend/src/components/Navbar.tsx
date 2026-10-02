@@ -1,6 +1,7 @@
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { BrandLogo } from "./BrandLogo";
 import { useAuth } from "../context/AuthContext";
 
 export function Navbar() {
@@ -17,7 +18,7 @@ export function Navbar() {
   return (
     <header className="navbar">
       <div className="nav-inner">
-        <Link className="brand" to="/" onClick={() => setMenuOpen(false)}><span className="brand-mark">Py</span> pypath<span className="brand-period">.</span></Link>
+        <Link className="brand brand-logo" to="/" aria-label="Your Choice Tech home" onClick={() => setMenuOpen(false)}><BrandLogo /></Link>
         <button className="menu-toggle" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
         <nav className={menuOpen ? "nav-links open" : "nav-links"}>
           <NavLink to="/courses" onClick={() => setMenuOpen(false)}>Courses</NavLink>

@@ -7,3 +7,46 @@
 .auth-page{min-height:100vh;padding:32px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 20%,#eef7e3,transparent 42%),#f8faf8}.auth-back{position:absolute;top:29px;left:32px;display:flex;align-items:center;gap:7px;color:#738078;font-size:12px}.auth-card{width:min(100%,425px);padding:36px;background:white;border:1px solid var(--line);border-radius:15px;box-shadow:0 18px 65px #283b2b0d}.auth-logo{margin-bottom:25px}.auth-card h1{font-size:29px;line-height:1.15;letter-spacing:-1.2px;margin:11px 0 8px}.auth-card>p{color:#77827a;font-size:12px;line-height:1.7;margin:0}.auth-form{display:grid;gap:15px;margin-top:25px}.field{display:grid;gap:7px;color:#46534a;font-size:11px;font-weight:650}.input-wrap{height:44px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #e2e8e2;border-radius:8px;color:#8a968d}.input-wrap:focus-within{border-color:#96bb6e;box-shadow:0 0 0 3px #b9ee7826}.input-wrap input{width:100%;border:0;outline:0;background:transparent;color:#243329;font-size:12px}.input-wrap input::placeholder{color:#aab2ac}.field small{font-weight:450;color:#c04836}.show-password{border:0;background:none;color:#7f8a82;padding:3px}.form-error{padding:11px 12px;border-radius:7px;background:#fff0ed;color:#a23a2c;font-size:11px;line-height:1.55}.auth-submit{width:100%;margin-top:3px}.auth-submit:disabled{opacity:.65;cursor:wait}.auth-switch{margin-top:21px;text-align:center;color:#77827a;font-size:11px}.auth-switch a{color:#395a30;font-weight:700}.auth-side-note{display:flex;align-items:center;gap:8px;margin-top:19px;color:#879187;font-size:10px}.auth-side-note svg{color:#78965e}
 @media(max-width:850px){.hero-inner{gap:23px}.hero h1{font-size:59px;letter-spacing:-3.8px}.hero-visual{min-height:340px}.code-content{font-size:10px}.note-top{right:0}.note-bottom{left:0}.cta-section{margin-left:24px;margin-right:24px}.section-heading h2{font-size:35px}}
 @media(max-width:650px){.navbar{height:66px}.nav-inner{padding:0 19px}.menu-toggle{display:block}.nav-links{display:none;position:absolute;top:65px;left:0;right:0;padding:14px 20px 19px;background:#f8faf8;border-bottom:1px solid var(--line);align-items:stretch;gap:3px}.nav-links.open{display:flex;flex-direction:column}.nav-links a,.nav-login{padding:12px 8px;text-align:left}.nav-cta{justify-content:center}.hero{padding:55px 19px 25px}.hero-inner{grid-template-columns:1fr;gap:22px}.hero-copy{padding:0}.hero h1{font-size:56px;letter-spacing:-3.5px;margin:22px 0 15px}.hero-description{font-size:14px}.hero-actions{flex-wrap:wrap}.hero-visual{min-height:310px}.code-window{width:calc(100% - 18px)}.code-content{padding:18px 14px;font-size:10px}.line-number{font-size:9px}.float-note{font-size:9px}.note-top{right:-2px;top:3px}.note-bottom{left:-2px;bottom:0}.scroll-cue{margin-top:22px}.section{padding:59px 19px}.section-heading{align-items:flex-start;flex-direction:column;gap:15px}.section-heading h2{font-size:34px}.section-heading>p{font-size:12px}.steps-grid,.course-grid{grid-template-columns:1fr}.step-card{min-height:160px}.step-card h3{margin-top:18px}.course-art{height:175px}.empty-courses{align-items:flex-start;flex-wrap:wrap;padding:18px}.empty-courses .text-link{margin-left:60px}.cta-section{align-items:flex-start;flex-direction:column;margin:10px 19px 45px;padding:28px 23px}.cta-section h2{font-size:24px}.cta-decoration{right:15px;top:9px;font-size:80px}.footer{padding:19px;gap:12px;flex-wrap:wrap}.footer>span:nth-child(2){order:3;width:100%}.content-page{padding-top:45px}.content-page h1{font-size:42px}.content-intro{font-size:13px}.dashboard-stats{grid-template-columns:1fr 1fr}.dashboard-panel{align-items:flex-start;flex-direction:column}.auth-back{top:18px;left:18px}.auth-card{padding:27px 23px}.auth-card h1{font-size:26px}.course-detail-header{padding-top:30px}.module-panel{padding:16px}.video-placeholder{aspect-ratio:4/3}}
+.brand-logo-content{display:inline-flex;align-items:center;gap:10px}
+.brand-logo-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px}
+.brand-logo-icon img{display:block;width:100%;height:100%;object-fit:contain}
+.brand-logo-type{display:grid;gap:1px}
+.brand-logo-name{color:#17231e;font-size:18px;font-weight:780;letter-spacing:-.7px;white-space:nowrap}
+.brand-logo-tagline{color:#123be8;font-size:9px;font-weight:850;letter-spacing:2.5px}
+.brand-logo{gap:0}
+.auth-logo{margin-bottom:25px;text-decoration:none}
+.auth-logo .brand-logo-icon{width:48px;height:48px;flex-basis:48px}
+.auth-logo .brand-logo-name{font-size:21px}
+.auth-logo .brand-logo-tagline{font-size:10px}
+.footer-socials{display:flex;align-items:center;gap:13px}
+.footer-socials a,.footer-socials button{display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:50%;background:transparent;color:#58635c;transition:color .15s,border-color .15s,background .15s}
+.footer-socials a:hover{color:#fff;background:#19241e;border-color:#19241e}
+.footer-socials button:disabled{opacity:.48;cursor:not-allowed}
+@media(max-width:650px){.brand-logo-icon{width:36px;height:36px;flex-basis:36px}.brand-logo-name{font-size:16px}.footer-socials{order:3}.footer>span:nth-child(2){order:4}.footer>span:last-child{order:2}}
+.learning-board{width:min(100%,464px);padding:23px;border:1px solid #e6ece5;border-radius:18px;background:#fff;box-shadow:0 30px 75px #20362818;transform:rotate(1deg)}
+.hero-visual .note-top{top:-12px;right:-12px}
+.learning-board-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.learning-board-header>div{display:grid;gap:7px}
+.learning-board-header .eyebrow{font-size:8px}
+.learning-board-header strong{font-size:17px;letter-spacing:-.45px}
+.learning-board-sparkle{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#eef4ff;color:#2446e8}
+.learning-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.learning-card{min-height:76px;display:flex;align-items:center;gap:10px;padding:11px;border:1px solid #edf0ed;border-radius:11px}
+.learning-card-icon{display:grid;place-items:center;width:36px;height:36px;flex:0 0 36px;border-radius:10px;background:#edf5e4;color:#5f833e}
+.learning-science .learning-card-icon{background:#f1edff;color:#7663c5}
+.learning-creative .learning-card-icon{background:#fff0e8;color:#c77d4c}
+.learning-tech .learning-card-icon{background:#eaf2ff;color:#3b6db4}
+.learning-card-copy{display:grid;gap:4px;min-width:0}
+.learning-card-copy strong{font-size:11px;color:#26352a}
+.learning-card-copy small,.learning-board-footer small{font-size:9px;line-height:1.4;color:#869087}
+.learning-card-arrow{margin-left:auto;flex:0 0 16px;color:#a0aaa1}
+.learning-board-footer{display:flex;align-items:center;gap:10px;margin-top:16px;padding:13px 12px;border-radius:11px;background:#f7f9f6}
+.learning-progress-icon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:9px;background:#e8f3df;color:#668b4c}
+.learning-board-footer>span:nth-child(2){display:grid;gap:4px}
+.learning-board-footer strong{font-size:10px;color:#3e4d40}
+.learning-progress{width:52px;height:5px;margin-left:auto;overflow:hidden;border-radius:6px;background:#e2e8df}
+.learning-progress i{display:block;width:68%;height:100%;border-radius:inherit;background:#91bb68}
+.note-bottom .play-badge{background:#e8f3df;color:#668b4c}
+.cta-decoration svg{width:62px;height:62px;stroke-width:1.2}
+@media(max-width:850px){.learning-board{padding:19px}.learning-card{padding:9px;gap:8px}.learning-card-copy small{font-size:8px}}
+@media(max-width:650px){.hero-visual{min-height:350px}.learning-board{width:calc(100% - 18px);padding:17px;transform:none}.learning-board-header strong{font-size:15px}.learning-card{min-height:70px}.learning-card-icon{width:32px;height:32px;flex-basis:32px}.learning-card-copy strong{font-size:10px}.learning-card-copy small{font-size:7px}.learning-progress{width:38px}}

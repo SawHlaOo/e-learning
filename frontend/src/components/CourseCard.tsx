@@ -12,8 +12,8 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
           event.currentTarget.hidden = true;
           event.currentTarget.parentElement?.classList.remove("has-course-image");
         }} />}
-        <span className="course-art-label">PYTHON · {course.level}</span>
-        <span className="course-art-mark">Py</span>
+        <span className="course-art-label">LEARNING PATH · {course.level}</span>
+        <span className="course-art-mark"><BookOpen size={48} strokeWidth={1.5} aria-hidden="true" /></span>
         <span className="course-art-grid" />
         <span className="course-art-arrow"><ArrowUpRight size={18} /></span>
       </div>
