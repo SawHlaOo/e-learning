@@ -1,6 +1,6 @@
 # PyPath — Python Learning Platform
 
-PyPath is a modular learning platform starter built with React, Vite, TypeScript, Express, Prisma, and PostgreSQL. Frontend and backend live in separate `frontend/` and `backend/` folders, with independent package manifests. The small root package coordinates local development and the single-project Vercel deployment. The production database can be Neon PostgreSQL; no database URL or other secret is bundled in the frontend.
+PyPath is a modular learning platform starter built with React, Vite, TypeScript, Express, Prisma, and PostgreSQL. Frontend and backend live in separate `frontend/` and `backend/` folders, with independent package manifests and separate Vercel projects. The root package coordinates local development. The production database can be Neon PostgreSQL; no database URL or other secret is bundled in the frontend.
 
 The current foundation includes the responsive public site, layered backend, cookie-based registration/login, role-protected student/admin routes, server-side admin authorization, paginated learning APIs, and the complete learning-platform Prisma data model. Python submissions are stored but never executed by the API.
 
@@ -8,10 +8,9 @@ The current foundation includes the responsive public site, layered backend, coo
 
 ```text
 .
-├── api/
-│   └── index.ts                # Vercel serverless Express function
 ├── frontend/
 │   ├── package.json            # React/Vite app and frontend dependencies
+│   ├── vercel.json             # Frontend Vercel project configuration
 │   ├── src/
 │   │   ├── components/         # Shared navigation, cards, route guards
 │   │   ├── context/            # Authentication state
@@ -20,7 +19,10 @@ The current foundation includes the responsive public site, layered backend, coo
 │   │   └── types/
 │   └── vite.config.ts
 ├── backend/
+│   ├── api/
+│   │   └── index.ts            # Vercel serverless Express function
 │   ├── package.json            # Express/Prisma app and backend dependencies
+│   ├── vercel.json             # Backend Vercel project configuration
 │   ├── prisma/
 │   │   ├── schema.prisma
 │   │   ├── migrations/
@@ -37,11 +39,10 @@ The current foundation includes the responsive public site, layered backend, coo
 │       ├── app.ts
 │       └── index.ts
 ├── .env.example
-├── package.json
-└── vercel.json
+└── package.json
 ```
 
-`frontend/` and `backend/` are independent npm workspaces with their own `package.json` files, source, and dependencies. The root package contains only the workspace coordinator and development scripts.
+`frontend/` and `backend/` are independent npm workspaces with their own `package.json` files, source, and dependencies. Each folder is deployed as the Root Directory of its own Vercel project.
 
 The backend follows `routes → controllers → services → repositories → Prisma`. Routes declare endpoint middleware, controllers handle HTTP input/output, services enforce business rules, and repositories contain database queries. The Prisma client is shared through `backend/src/config/database.ts`.
 
@@ -147,21 +148,23 @@ Client variable (optional locally; Vite proxies `/api` if unset):
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_URL` | API base URL. Local value can be `http://localhost:5000/api`; production should be `/api` or left unset |
+| `VITE_API_URL` | API base URL. Local value can be `http://localhost:5000/api`; for the separate frontend deployment set it to the full backend URL ending in `/api` |
 
 Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. Do not put real credentials in GitHub.
 
 ## Vercel deployment
 
 1. Push the repository to GitHub.
-2. Import the repository in Vercel as a single project. Prefer **Root Directory** set to the repository root (`.`; the folder containing the root `package.json`, `api/`, `frontend/`, and `backend/`). Set **Framework Preset** to **Other**. The root `vercel.json` explicitly disables framework auto-detection so Express is not mistaken for the static Vite build. If Vercel still shows `workspace python-learning-platform-backend` or `/vercel/path0/backend`, the project is rooted at `backend/`; the backend also contains a Vercel config, API entrypoint, and build step that copies the frontend output into its static output folder to support that root setting. Its Framework Preset must also be **Other**.
-3. In **Vercel → Project → Settings → Environment Variables**, configure `DATABASE_URL` with the Neon PostgreSQL connection string, `JWT_SECRET` with a strong random secret, `CLIENT_URL` with the exact production domain (for example `https://my-python-course.vercel.app`), and `NODE_ENV=production`. Apply the variables to the intended Production/Preview/Development environments as appropriate. Do not commit the actual values.
-4. Deploy. From the repository root, Vercel runs `npm run vercel-build`: it ensures the frontend workspace dependencies are installed, generates Prisma Client, type-checks the backend, and builds the Vite frontend into `frontend/dist`. A `backend/`-rooted deployment additionally copies those static files into `backend/vercel-output` and uses `backend/api/index.ts`. These build steps do not connect to PostgreSQL.
-5. Open `https://YOUR-VERCEL-DOMAIN.vercel.app/api/health`.
-6. Apply the checked-in database migrations to Neon using `npm run prisma:migrate` with `DATABASE_URL` configured for that database. The development seed refuses to run with `NODE_ENV=production`; do not seed the production database.
-7. Register/login, browse a published course, and verify that a non-admin is denied `/api/admin/*` and `/admin`.
+2. Create a Vercel project for the API. Select the repository and set **Root Directory** to `backend`. Use **Framework Preset: Other**. Its `backend/vercel.json` builds Prisma/backend code and deploys `backend/api/index.ts` as the serverless API; it does not build the frontend.
+3. Add `DATABASE_URL` (Neon connection string), `JWT_SECRET` (strong random secret), `CLIENT_URL` (the exact frontend origin, e.g. `https://my-python-course.vercel.app`), and `NODE_ENV=production` to the **backend Vercel project**. Do not add `DATABASE_URL` or `JWT_SECRET` to the frontend project.
+4. Deploy the backend project and note its URL, for example `https://my-python-course-api.vercel.app`. Check `https://YOUR-API-DOMAIN.vercel.app/api/health`.
+5. Create a second Vercel project from the same repository. Set **Root Directory** to `frontend`, use **Framework Preset: Other**, and add `VITE_API_URL=https://YOUR-API-DOMAIN.vercel.app/api` to its environment variables. The `frontend/vercel.json` builds the Vite app into `dist` and rewrites client-side routes to `index.html`.
+6. Deploy the frontend project. Set the backend project's `CLIENT_URL` to the resulting frontend origin exactly (scheme + hostname, no path), then redeploy the backend so CORS uses the right origin.
+7. For production login, prefer custom domains on the same site, such as `learn.example.com` and `api.example.com`. The API uses secure cross-origin cookies in production; browser third-party-cookie restrictions can interfere when the two projects use unrelated default `*.vercel.app` hostnames.
+8. Apply the checked-in database migrations to Neon using `npm run prisma:migrate` with `DATABASE_URL` configured for that database. The development seed refuses to run with `NODE_ENV=production`; do not seed the production database.
+9. Register/login, browse a published course, and verify that a non-admin is denied `/api/admin/*` and `/admin`.
 
-Vercel serves the built `frontend/dist` assets and routes `/api/*` to the Express function in `api/index.ts`, which imports the app from `backend/src/app.ts`. All other paths resolve to the frontend `index.html`, so client-side routes such as `/courses/123`, `/lessons/456`, `/dashboard`, and `/admin` can be refreshed. The Express app is exported; only the backend's local development entry point calls `app.listen()`.
+The frontend and Express API deploy independently. The API is exported from `backend/api/index.ts`; only the backend's local development entry point calls `app.listen()`. The frontend calls the API using the public `VITE_API_URL` setting, while CORS only permits the origin configured in the backend's `CLIENT_URL`.
 
 The built-in rate-limit store is in-memory and therefore applies per running process/function instance. For a multi-instance production deployment that needs a strict shared quota, configure a shared Redis-compatible rate-limit store before relying on limits as a global abuse-control boundary.
 

@@ -2,7 +2,6 @@ node_modules/
 dist/
 frontend/dist/
 backend/dist/
-backend/vercel-output/
 .vercel/
 .env
 .env.*
