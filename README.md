@@ -148,7 +148,7 @@ Client variable (optional locally; Vite proxies `/api` if unset):
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_API_URL` | API base URL. Local value can be `http://localhost:5000/api`; for the separate frontend deployment set it to the full backend URL ending in `/api` |
+| `VITE_API_URL` | Local API base URL, e.g. `http://localhost:5000/api`. Production uses the frontend Vercel `/api` proxy instead. |
 
 Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. Do not put real credentials in GitHub.
 
@@ -158,13 +158,12 @@ Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. 
 2. Create a Vercel project for the API. Select the repository and set **Root Directory** to `backend`. Use **Framework Preset: Other**. Its `backend/vercel.json` builds Prisma/backend code and deploys `backend/api/index.ts` as the serverless API; it does not build the frontend.
 3. Add `DATABASE_URL` (Neon connection string), `JWT_SECRET` (strong random secret), `CLIENT_URL` (the exact frontend origin, e.g. `https://my-python-course.vercel.app`), and `NODE_ENV=production` to the **backend Vercel project**. Do not add `DATABASE_URL` or `JWT_SECRET` to the frontend project.
 4. Deploy the backend project and note its URL, for example `https://my-python-course-api.vercel.app`. Check `https://YOUR-API-DOMAIN.vercel.app/api/health`.
-5. Create a second Vercel project from the same repository. Set **Root Directory** to `frontend`, use **Framework Preset: Other**, and add `VITE_API_URL=https://YOUR-API-DOMAIN.vercel.app/api` to its environment variables. The `frontend/vercel.json` builds the Vite app into `dist` and rewrites client-side routes to `index.html`.
-6. Deploy the frontend project. Set the backend project's `CLIENT_URL` to the resulting frontend origin exactly (scheme + hostname, no path), then redeploy the backend so CORS uses the right origin.
-7. For production login, prefer custom domains on the same site, such as `learn.example.com` and `api.example.com`. The API uses secure cross-origin cookies in production; browser third-party-cookie restrictions can interfere when the two projects use unrelated default `*.vercel.app` hostnames.
+5. Create a second Vercel project from the same repository. Set **Root Directory** to `frontend` and use **Framework Preset: Other**. The `frontend/vercel.json` builds the Vite app into `dist`, proxies `/api/*` to the backend project, and rewrites other routes to `index.html`. If the backend project URL changes, update the API rewrite destination in that file.
+6. Deploy the frontend project. Set the backend project's `CLIENT_URL` to the exact frontend origin (scheme + hostname, no path), then redeploy the backend so CORS permits the proxied request origin. The browser communicates with the frontend origin, so auth cookies remain first-party and Vercel handles the API proxy.
 8. Apply the checked-in database migrations to Neon using `npm run prisma:migrate` with `DATABASE_URL` configured for that database. The development seed refuses to run with `NODE_ENV=production`; do not seed the production database.
 9. Register/login, browse a published course, and verify that a non-admin is denied `/api/admin/*` and `/admin`.
 
-The frontend and Express API deploy independently. The API is exported from `backend/api/index.ts`; only the backend's local development entry point calls `app.listen()`. The frontend calls the API using the public `VITE_API_URL` setting, while CORS only permits the origin configured in the backend's `CLIENT_URL`.
+The frontend and Express API deploy independently. The API is exported from `backend/api/index.ts`; only the backend's local development entry point calls `app.listen()`. In production the frontend calls its own `/api` path, which Vercel proxies to the backend; local development can use `VITE_API_URL`. CORS permits the frontend origin configured in the backend's `CLIENT_URL`.
 
 The built-in rate-limit store is in-memory and therefore applies per running process/function instance. For a multi-instance production deployment that needs a strict shared quota, configure a shared Redis-compatible rate-limit store before relying on limits as a global abuse-control boundary.
 
