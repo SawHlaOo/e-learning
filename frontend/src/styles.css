@@ -43,6 +43,10 @@
 :root[data-theme="dark"] .nav-cta,:root[data-theme="dark"] .button-dark{background:#b9ee78;color:#17231e}
 :root[data-theme="dark"] .nav-cta:hover,:root[data-theme="dark"] .button-dark:hover{background:#a4dc62}
 :root[data-theme="dark"] .hero{background:radial-gradient(ellipse at 83% 38%,#263524 0%,transparent 38%),#151d18}
+:root[data-theme="dark"] .cta-section{background:#202b23;border:1px solid #344239;box-shadow:0 16px 42px #0003}
+:root[data-theme="dark"] .cta-section h2{color:#edf3ee}
+:root[data-theme="dark"] .cta-section .eyebrow{color:#a9b5ab}
+:root[data-theme="dark"] .cta-decoration{color:#b9ee78;opacity:.12}
 :root[data-theme="dark"] .hero-description,:root[data-theme="dark"] .section-heading>p,:root[data-theme="dark"] .hero-proof,:root[data-theme="dark"] .scroll-cue,:root[data-theme="dark"] .content-intro,:root[data-theme="dark"] .course-detail-header p,:root[data-theme="dark"] .lesson-heading p{color:#a9b5ab}
 :root[data-theme="dark"] .pill,:root[data-theme="dark"] .float-note{background:#202b23;border-color:#3a493d;color:#d3ddd4}
 :root[data-theme="dark"] .hero-proof strong,:root[data-theme="dark"] .note-bottom strong,:root[data-theme="dark"] .learning-card-copy strong{color:#e5ece6}
