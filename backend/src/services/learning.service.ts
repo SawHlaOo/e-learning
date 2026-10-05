@@ -133,6 +133,31 @@ export class QuizService {
     };
   }
 
+  async getResults(userId: string, quizId: string) {
+    const quiz = await this.quizzes.findPublishedById(quizId);
+    if (!quiz) throw new NotFoundError("Quiz not found");
+    const attempts = [...await this.quizzes.findAttemptsForUser(quizId, userId)].sort(
+      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+    );
+    const bestScore = attempts.reduce((best, attempt) => Math.max(best, attempt.score), 0);
+    return {
+      quizId,
+      title: quiz.title,
+      passingPercentage: quiz.passingPercentage,
+      attemptCount: attempts.length,
+      bestScore,
+      attempts: attempts.map((attempt) => ({
+        id: attempt.id,
+        score: attempt.score,
+        percentage: attempt.percentage,
+        passed: attempt.passed,
+        correctCount: attempt.correctCount,
+        incorrectCount: attempt.incorrectCount,
+        createdAt: attempt.createdAt,
+      })),
+    };
+  }
+
   async submit(userId: string, quizId: string, answers: Record<string, QuizAnswerValue>) {
     const quiz = await this.quizzes.findPublishedWithAnswers(quizId);
     if (!quiz) throw new NotFoundError("Quiz not found");
@@ -146,8 +171,6 @@ export class QuizService {
     }
     const correctQuestions = quiz.questions.filter((question) => isAnswerCorrect(question, answers[question.id]));
     const correct = correctQuestions.length;
-    // Legacy records/tests may not have points populated; treat those as one
-    // point so they retain the original equal-weight behavior.
     const pointsFor = (question: { points?: number | null }) => Math.max(0, question.points ?? 1);
     const totalPoints = quiz.questions.reduce((sum, question) => sum + pointsFor(question), 0);
     const earnedPoints = correctQuestions.reduce((sum, question) => sum + pointsFor(question), 0);

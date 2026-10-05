@@ -189,12 +189,14 @@ API resource responses use `{ "success": true, "data": ... }`. Errors use `{ "su
 | `GET` | `/api/exercises`, `/api/exercises/:id` | Public (published content) |
 | `POST` | `/api/exercises/:id/submit` | Authenticated; stores code, does not execute it |
 | `GET`, `POST` | `/api/quizzes`, `/api/quizzes/:id/attempts` | Public quiz list; authenticated attempts |
+| `GET` | `/api/quizzes/:id/results` | Authenticated user's quiz-attempt summary; never exposes answer keys |
 | `GET`, `POST` | `/api/progress`, `/api/progress/lesson` | Authenticated |
 | `GET`, `POST`, `PUT`, `DELETE` | `/api/youtube`, `/api/youtube/:id` | Public reads; Instructor/Admin writes |
 | `GET` | `/api/certificates/verify/:code` | Public verification |
 | `GET` | `/api/certificates` | Authenticated user's certificates |
 | `GET` | `/api/admin/students`, `/api/admin/users`, `/api/admin/courses`, `/api/admin/analytics` | Admin only |
 | `GET` | `/api/admin/courses/:id` | Admin only; full course curriculum, including drafts |
+| `GET`, `POST`, `PUT`, `DELETE` | `/api/admin/quizzes`, `/api/admin/quizzes/:id`, `/api/admin/quiz-questions/:id` | Admin only |
 
 Paginated list endpoints accept `?page=1&limit=20` (maximum limit: 100). Existing array-valued `data` responses are preserved; pagination metadata is included alongside `data`. Quiz attempts remain repeatable learning attempts and are rate-limited; they are not silently made one-attempt-only.
 

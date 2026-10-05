@@ -131,6 +131,29 @@ test("quiz service rejects incomplete or foreign-question submissions", async ()
   assert.equal(attemptCreated, false);
 });
 
+test("quiz service returns a per-user result summary without exposing answers", async () => {
+  const repository = {
+    findPublishedById: async () => ({
+      id: "quiz-1",
+      title: "Python basics",
+      passingPercentage: 70,
+      questions: [],
+    }),
+    findAttemptsForUser: async () => [
+      { id: "attempt-1", score: 50, percentage: 50, passed: false, correctCount: 1, incorrectCount: 1, createdAt: new Date("2024-01-01") },
+      { id: "attempt-2", score: 90, percentage: 90, passed: true, correctCount: 2, incorrectCount: 0, createdAt: new Date("2024-01-02") },
+    ],
+  } as unknown as QuizRepository;
+  const service = new QuizService(repository);
+
+  const result = await service.getResults("student-1", "quiz-1");
+  assert.equal(result.attemptCount, 2);
+  assert.equal(result.bestScore, 90);
+  assert.equal(result.attempts[0].score, 90);
+  assert.equal(result.attempts[0].passed, true);
+  assert.equal(result.title, "Python basics");
+});
+
 test("quiz service honors question points and rejects duplicate multiple-choice values", async () => {
   const repository = {
     findPublishedWithAnswers: async () => ({

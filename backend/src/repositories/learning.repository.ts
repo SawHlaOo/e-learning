@@ -156,38 +156,66 @@ export class QuizRepository {
     });
   }
 
+  findAttemptsForUser(quizId: string, userId: string) {
+    return prisma.quizAttempt.findMany({
+      where: { quizId, userId },
+      select: {
+        id: true,
+        score: true,
+        percentage: true,
+        passed: true,
+        correctCount: true,
+        incorrectCount: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
   createAttempt(data: PrismaTypes.QuizAttemptUncheckedCreateInput) {
     return prisma.$transaction(async (tx) => {
       const attempt = await tx.quizAttempt.create({
         data,
         select: { id: true, score: true, passed: true, createdAt: true },
       });
+
       if (data.passed) {
-        const quiz = await tx.quiz.findUnique({ where: { id: data.quizId }, select: { lessonId: true } });
+        const quiz = await tx.quiz.findUnique({
+          where: { id: data.quizId },
+          select: { lessonId: true },
+        });
         if (quiz?.lessonId) {
           const lesson = await tx.lesson.findUnique({
             where: { id: quiz.lessonId },
             select: { id: true, module: { select: { courseId: true } } },
           });
           if (lesson) {
+            const completedAt = new Date();
             await tx.lessonProgress.upsert({
               where: { userId_lessonId: { userId: data.userId, lessonId: lesson.id } },
-              create: { userId: data.userId, lessonId: lesson.id, completed: true, completedAt: new Date() },
-              update: { completed: true, completedAt: new Date() },
+              create: { userId: data.userId, lessonId: lesson.id, completed: true, completedAt },
+              update: { completed: true, completedAt },
             });
             const [lessonCount, completedCount] = await Promise.all([
               tx.lesson.count({ where: { module: { courseId: lesson.module.courseId }, published: true } }),
-              tx.lessonProgress.count({ where: { userId: data.userId, completed: true, lesson: { module: { courseId: lesson.module.courseId }, published: true } } }),
+              tx.lessonProgress.count({
+                where: {
+                  userId: data.userId,
+                  completed: true,
+                  lesson: { module: { courseId: lesson.module.courseId }, published: true },
+                },
+              }),
             ]);
             if (lessonCount > 0 && lessonCount === completedCount) {
               await tx.enrollment.updateMany({
-                where: { userId: data.userId, courseId: lesson.module.courseId },
-                data: { status: "COMPLETED", completedAt: new Date() },
+                where: { userId: data.userId, courseId: lesson.module.courseId, status: "ACTIVE" },
+                data: { status: "COMPLETED", completedAt },
               });
             }
           }
         }
       }
+
       return attempt;
     });
   }
