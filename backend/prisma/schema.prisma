@@ -25,6 +25,14 @@ enum EnrollmentStatus {
   SUSPENDED
 }
 
+enum QuizQuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  FILL_BLANK
+  CODE
+}
+
 model User {
   id                  String               @id @default(cuid())
   name                String
@@ -177,45 +185,64 @@ model ExerciseSubmission {
 }
 
 model Quiz {
-  id                String         @id @default(cuid())
-  title             String
-  description       String         @default("") @db.Text
-  passingPercentage Int            @default(70)
-  published         Boolean        @default(false)
-  lessonId          String?
-  lesson            Lesson?        @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  questions         QuizQuestion[]
-  attempts          QuizAttempt[]
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  id                 String         @id @default(cuid())
+  title              String
+  description        String         @default("") @db.Text
+  instructions       String         @default("") @db.Text
+  difficulty         Difficulty     @default(EASY)
+  passingPercentage  Int            @default(70)
+  timeLimitMinutes   Int            @default(0)
+  randomizeQuestions Boolean        @default(false)
+  randomizeAnswers   Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  published          Boolean        @default(false)
+  lessonId           String?
+  lesson             Lesson?        @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  questions          QuizQuestion[]
+  attempts           QuizAttempt[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   @@index([published])
   @@index([published, createdAt])
 }
 
 model QuizQuestion {
-  id            String  @id @default(cuid())
+  id            String          @id @default(cuid())
   quizId        String
-  prompt        String  @db.Text
-  options       Json
-  correctAnswer Int
-  explanation   String? @db.Text
+  type          QuizQuestionType @default(SINGLE_CHOICE)
+  prompt        String          @db.Text
+  options       Json            @default("[]")
+  correctAnswer Json?
+  acceptedAnswers Json?
+  explanation   String?         @db.Text
+  hint          String?         @db.Text
+  points        Int             @default(10)
+  difficulty    Difficulty      @default(EASY)
+  codeSnippet   String?        @db.Text
+  mediaUrl      String?
+  isActive      Boolean         @default(true)
   order         Int
-  quiz          Quiz    @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz          Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@unique([quizId, order])
 }
 
 model QuizAttempt {
-  id        String   @id @default(cuid())
-  userId    String
-  quizId    String
-  score     Int
-  passed    Boolean
-  answers   Json
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  userId        String
+  quizId        String
+  score         Int
+  percentage    Int      @default(0)
+  passed        Boolean
+  correctCount  Int      @default(0)
+  incorrectCount Int     @default(0)
+  answers       Json
+  startedAt     DateTime?
+  completedAt   DateTime?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
 
   @@index([userId, quizId, createdAt])
 }

@@ -39,8 +39,16 @@ export const exerciseSubmissionBodySchema = z.object({
   code: z.string().min(1).max(20000),
 });
 
+const quizAnswerValueSchema = z.union([
+  z.number().int().min(0).max(100),
+  z.boolean(),
+  z.string().trim().min(1).max(5000),
+  z.array(z.number().int().min(0).max(100)).max(25),
+  z.array(z.string().trim().min(1).max(5000)).max(25),
+]);
+
 export const quizAttemptBodySchema = z.object({
-  answers: z.record(z.string().min(1).max(191), z.number().int().min(0).max(100)),
+  answers: z.record(z.string().min(1).max(191), quizAnswerValueSchema),
 }).refine((input) => Object.keys(input.answers).length <= 100, "Too many quiz answers");
 
 export const lessonProgressBodySchema = z.object({

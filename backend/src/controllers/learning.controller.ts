@@ -88,6 +88,11 @@ export class QuizController {
     return success(res, result.items, 200, result.pagination);
   };
 
+  get = async (req: Request, res: Response) => {
+    const { id } = validatedInput<z.infer<typeof idParamsSchema>>(res, "params");
+    return success(res, await quizService.get(id));
+  };
+
   submit = async (req: Request, res: Response) => {
     const { id } = validatedInput<z.infer<typeof idParamsSchema>>(res, "params");
     const { answers } = validatedInput<z.infer<typeof quizAttemptBodySchema>>(res, "body");

@@ -7,7 +7,7 @@ import { progressService } from "../services/progressService";
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const [progress, setProgress] = useState<{ enrollments: unknown[]; lessonProgress: unknown[] } | null>(null);
+  const [progress, setProgress] = useState<{ enrollments: unknown[]; lessonProgress: unknown[]; quizSummary: Array<{ bestScore: number }> } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => { progressService.get().then(setProgress).catch((cause: Error) => setError(cause.message)); }, []);
   return <main className="content-page section dashboard-page"><div className="eyebrow">YOUR LEARNING SPACE</div><h1>Welcome back, <span>{user?.name.split(" ")[0]}.</span></h1><p className="content-intro">Every lesson is progress. Keep your learning momentum going.</p>{error && <div className="form-error">{error}</div>}<div className="dashboard-stats"><div><BookOpen /><strong>{progress?.enrollments.length ?? "—"}</strong><span>Enrolled courses</span></div><div><Activity /><strong>{progress?.lessonProgress.filter((item) => (item as { completed?: boolean }).completed).length ?? "—"}</strong><span>Lessons completed</span></div><div><GraduationCap /><strong>—</strong><span>Certificates earned</span></div></div><section className="dashboard-panel"><div><h2>Keep the momentum</h2><p>Your next lesson is one click away.</p></div><Link className="button button-dark" to="/courses">Explore courses <ArrowRight size={17} /></Link></section></main>;

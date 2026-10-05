@@ -130,3 +130,25 @@ test("quiz service rejects incomplete or foreign-question submissions", async ()
   }));
   assert.equal(attemptCreated, false);
 });
+
+test("quiz service honors question points and rejects duplicate multiple-choice values", async () => {
+  const repository = {
+    findPublishedWithAnswers: async () => ({
+      id: "quiz-2",
+      passingPercentage: 70,
+      questions: [
+        { id: "question-1", type: "SINGLE_CHOICE", correctAnswer: 0, points: 1 },
+        { id: "question-2", type: "MULTIPLE_CHOICE", correctAnswer: [1, 2], points: 3 },
+      ],
+    }),
+    createAttempt: async (attempt: Record<string, unknown>) => ({ id: "attempt-2", ...attempt, createdAt: new Date() }),
+  } as unknown as QuizRepository;
+  const service = new QuizService(repository);
+
+  const result = await service.submit("student-1", "quiz-2", {
+    "question-1": 0,
+    "question-2": [1, 1],
+  });
+  assert.equal(result.score, 25);
+  assert.equal(result.correctAnswers, 1);
+});

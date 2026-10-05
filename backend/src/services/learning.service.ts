@@ -73,6 +73,49 @@ export class ExerciseService {
   }
 }
 
+type QuizAnswerValue = number | string | boolean | Array<number> | Array<string> | Array<boolean>;
+
+function normalizeScalar(value: unknown): string {
+  if (typeof value === "string") return value.trim().toLowerCase();
+  if (typeof value === "number" || typeof value === "boolean") return String(value);
+  if (value === null || value === undefined) return "";
+  if (Array.isArray(value)) return value.map((entry) => normalizeScalar(entry)).join("|");
+  return JSON.stringify(value ?? "");
+}
+
+function normalizeList(value: unknown): Array<string> {
+  if (Array.isArray(value)) return value.map((entry) => normalizeScalar(entry));
+  return [normalizeScalar(value)];
+}
+
+function isAnswerCorrect(question: { correctAnswer?: unknown; acceptedAnswers?: unknown; type?: string }, submitted: unknown) {
+  const correctCandidates = [question.correctAnswer, question.acceptedAnswers].filter((candidate) => candidate !== undefined && candidate !== null);
+  const acceptedValues = correctCandidates.length > 0
+    ? correctCandidates.flatMap((candidate) => Array.isArray(candidate) ? candidate : [candidate])
+    : [];
+
+  if (acceptedValues.length === 0) return false;
+
+  const submittedNormalized = normalizeList(submitted);
+  const expectedNormalized = acceptedValues.flatMap((candidate) => normalizeList(candidate));
+
+  switch (question.type) {
+    case "MULTIPLE_CHOICE":
+      // Treat selections as a set. This prevents duplicate values in a forged
+      // request from being accepted as a correct answer.
+      return submittedNormalized.length > 0
+        && new Set(submittedNormalized).size === new Set(expectedNormalized).size
+        && submittedNormalized.length === expectedNormalized.length
+        && expectedNormalized.every((value) => submittedNormalized.includes(value));
+    case "TRUE_FALSE":
+      return submittedNormalized[0] === expectedNormalized[0];
+    case "FILL_BLANK":
+      return expectedNormalized.some((value) => submittedNormalized.includes(value));
+    default:
+      return submittedNormalized[0] === expectedNormalized[0];
+  }
+}
+
 export class QuizService {
   constructor(private readonly quizzes: QuizRepository) {}
 
@@ -81,7 +124,16 @@ export class QuizService {
     return { items: result.items, pagination: paginationResult(page, result.total) };
   }
 
-  async submit(userId: string, quizId: string, answers: Record<string, number>) {
+  async get(id: string) {
+    const quiz = await this.quizzes.findPublishedById(id);
+    if (!quiz) throw new NotFoundError("Quiz not found");
+    return {
+      ...quiz,
+      questions: quiz.questions.map(({ correctAnswer, acceptedAnswers, explanation, ...question }) => question),
+    };
+  }
+
+  async submit(userId: string, quizId: string, answers: Record<string, QuizAnswerValue>) {
     const quiz = await this.quizzes.findPublishedWithAnswers(quizId);
     if (!quiz) throw new NotFoundError("Quiz not found");
     if (!quiz.questions.length) throw new NotFoundError("Quiz has no questions");
@@ -92,13 +144,22 @@ export class QuizService {
     if (quiz.questions.some((question) => !(question.id in answers))) {
       throw new ValidationError("Answer every question before submitting the quiz");
     }
-    const correct = quiz.questions.filter((question) => answers[question.id] === question.correctAnswer).length;
-    const score = Math.round((correct / quiz.questions.length) * 100);
+    const correctQuestions = quiz.questions.filter((question) => isAnswerCorrect(question, answers[question.id]));
+    const correct = correctQuestions.length;
+    // Legacy records/tests may not have points populated; treat those as one
+    // point so they retain the original equal-weight behavior.
+    const pointsFor = (question: { points?: number | null }) => Math.max(0, question.points ?? 1);
+    const totalPoints = quiz.questions.reduce((sum, question) => sum + pointsFor(question), 0);
+    const earnedPoints = correctQuestions.reduce((sum, question) => sum + pointsFor(question), 0);
+    const score = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
     const attempt = await this.quizzes.createAttempt({
       quizId,
       userId,
       score,
+      percentage: score,
       passed: score >= quiz.passingPercentage,
+      correctCount: correct,
+      incorrectCount: quiz.questions.length - correct,
       answers,
     });
     return { ...attempt, correctAnswers: correct, totalQuestions: quiz.questions.length };
@@ -109,10 +170,23 @@ export class ProgressService {
   constructor(private readonly progress: ProgressRepository) {}
 
   async get(userId: string, page: PageInput) {
-    const [enrollments, lessonProgress, exerciseSubmissions, quizAttempts, totals] =
-      await this.progress.findForUser(userId, page);
+    const [[enrollments, lessonProgress, exerciseSubmissions, quizAttempts, totals], allQuizAttempts] =
+      await Promise.all([this.progress.findForUser(userId, page), this.progress.findQuizSummary(userId)]);
+    const quizSummary = new Map<string, { quizId: string; title: string; attempts: number; bestScore: number; latestScore: number; passed: boolean }>();
+    for (const attempt of allQuizAttempts) {
+      const current = quizSummary.get(attempt.quizId);
+      const score = attempt.percentage ?? attempt.score;
+      if (!current) {
+        quizSummary.set(attempt.quizId, { quizId: attempt.quizId, title: attempt.quiz.title, attempts: 1, bestScore: score, latestScore: score, passed: attempt.passed });
+      } else {
+        current.attempts += 1;
+        current.bestScore = Math.max(current.bestScore, score);
+        current.passed ||= attempt.passed;
+        // Results are ordered newest first by the repository.
+      }
+    }
     return {
-      data: { enrollments, lessonProgress, exerciseSubmissions, quizAttempts },
+      data: { enrollments, lessonProgress, exerciseSubmissions, quizAttempts, quizSummary: Array.from(quizSummary.values()) },
       pagination: {
         enrollments: paginationResult(page, totals[0]),
         lessonProgress: paginationResult(page, totals[1]),

@@ -4,7 +4,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { AdminPage, AdminStudentsPage, DashboardPage } from "./pages/DashboardPages";
 import { AdminCoursesPage } from "./pages/AdminCoursesPage";
-import { CourseDetailPage, LessonPage } from "./pages/DetailPages";
+import { AdminQuizzesPage } from "./pages/AdminQuizzesPage";
+import { CourseDetailPage, LessonPage, QuizPage } from "./pages/DetailPages";
 import { AuthPage } from "./pages/AuthPage";
 import { CoursesPage } from "./pages/CoursesPage";
 import { HomePage } from "./pages/HomePage";
@@ -15,6 +16,7 @@ function SiteLayout() {
     <Route path="/courses" element={<CoursesPage />} />
     <Route path="/courses/:courseId" element={<CourseDetailPage />} />
     <Route path="/lessons/:lessonId" element={<LessonPage />} />
+    <Route path="/quizzes/:quizId" element={<QuizPage />} />
     <Route path="/login" element={<AuthPage />} />
     <Route path="/register" element={<AuthPage register />} />
     <Route element={<ProtectedRoute />}>
@@ -23,6 +25,7 @@ function SiteLayout() {
     <Route element={<ProtectedRoute admin />}>
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/courses" element={<AdminCoursesPage />} />
+      <Route path="/admin/quizzes" element={<AdminQuizzesPage />} />
       <Route path="/admin/students" element={<AdminStudentsPage />} />
       <Route path="/admin/*" element={<AdminPage />} />
     </Route>

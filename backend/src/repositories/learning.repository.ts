@@ -99,25 +99,109 @@ export class QuizRepository {
     return { items, total };
   }
 
+  findPublishedById(id: string) {
+    return prisma.quiz.findFirst({
+      where: { id, published: true },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        instructions: true,
+        difficulty: true,
+        passingPercentage: true,
+        timeLimitMinutes: true,
+        randomizeQuestions: true,
+        randomizeAnswers: true,
+        questions: {
+          where: { isActive: true },
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            type: true,
+            prompt: true,
+            options: true,
+            explanation: true,
+            hint: true,
+            points: true,
+            difficulty: true,
+            codeSnippet: true,
+            mediaUrl: true,
+            order: true,
+            correctAnswer: true,
+            acceptedAnswers: true,
+          },
+        },
+      },
+    });
+  }
+
   findPublishedWithAnswers(id: string) {
     return prisma.quiz.findFirst({
       where: { id, published: true },
       select: {
-        id: true, passingPercentage: true,
-        questions: { select: { id: true, correctAnswer: true } },
+        id: true,
+        passingPercentage: true,
+        questions: {
+          where: { isActive: true },
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            type: true,
+            points: true,
+            correctAnswer: true,
+            acceptedAnswers: true,
+          },
+        },
       },
     });
   }
 
   createAttempt(data: PrismaTypes.QuizAttemptUncheckedCreateInput) {
-    return prisma.quizAttempt.create({
-      data,
-      select: { id: true, score: true, passed: true, createdAt: true },
+    return prisma.$transaction(async (tx) => {
+      const attempt = await tx.quizAttempt.create({
+        data,
+        select: { id: true, score: true, passed: true, createdAt: true },
+      });
+      if (data.passed) {
+        const quiz = await tx.quiz.findUnique({ where: { id: data.quizId }, select: { lessonId: true } });
+        if (quiz?.lessonId) {
+          const lesson = await tx.lesson.findUnique({
+            where: { id: quiz.lessonId },
+            select: { id: true, module: { select: { courseId: true } } },
+          });
+          if (lesson) {
+            await tx.lessonProgress.upsert({
+              where: { userId_lessonId: { userId: data.userId, lessonId: lesson.id } },
+              create: { userId: data.userId, lessonId: lesson.id, completed: true, completedAt: new Date() },
+              update: { completed: true, completedAt: new Date() },
+            });
+            const [lessonCount, completedCount] = await Promise.all([
+              tx.lesson.count({ where: { module: { courseId: lesson.module.courseId }, published: true } }),
+              tx.lessonProgress.count({ where: { userId: data.userId, completed: true, lesson: { module: { courseId: lesson.module.courseId }, published: true } } }),
+            ]);
+            if (lessonCount > 0 && lessonCount === completedCount) {
+              await tx.enrollment.updateMany({
+                where: { userId: data.userId, courseId: lesson.module.courseId },
+                data: { status: "COMPLETED", completedAt: new Date() },
+              });
+            }
+          }
+        }
+      }
+      return attempt;
     });
   }
 }
 
 export class ProgressRepository {
+  findQuizSummary(userId: string) {
+    return prisma.quizAttempt.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      select: { quizId: true, score: true, percentage: true, passed: true, quiz: { select: { title: true } } },
+    });
+  }
+
   findForUser(userId: string, page: PageInput) {
     const skip = (page.page - 1) * page.limit;
     return Promise.all([
@@ -138,7 +222,7 @@ export class ProgressRepository {
       }),
       prisma.quizAttempt.findMany({
         where: { userId }, skip, take: page.limit,
-        select: { id: true, quizId: true, score: true, passed: true, createdAt: true },
+        select: { id: true, quizId: true, score: true, percentage: true, passed: true, correctCount: true, incorrectCount: true, createdAt: true, quiz: { select: { title: true } } },
         orderBy: { createdAt: "desc" },
       }),
       prisma.$transaction([

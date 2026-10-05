@@ -22,12 +22,36 @@ import quizRouter from "./routes/quiz.routes";
 import youTubeRouter from "./routes/youtube.routes";
 
 const app = express();
+const devLocalOrigins = new Set([
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:5175",
+]);
 const allowedOrigins = new Set(
   [
     env.CLIENT_URL,
-    ...(env.NODE_ENV === "production" ? [] : ["http://localhost:5173"]),
+    ...(env.NODE_ENV === "production" ? [] : Array.from(devLocalOrigins)),
   ].filter((origin): origin is string => Boolean(origin)),
 );
+
+function isAllowedOrigin(origin: string | undefined) {
+  if (!origin) return true;
+  if (allowedOrigins.has(origin)) return true;
+
+  try {
+    const parsed = new URL(origin);
+    const host = parsed.hostname.toLowerCase();
+    const isLocalhost = host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
+    if (!isLocalhost) return false;
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+    return /^517\d+$/.test(parsed.port || "");
+  } catch {
+    return false;
+  }
+}
 
 app.set("trust proxy", 1);
 app.use(helmet());
@@ -35,7 +59,7 @@ app.use(requestLogger);
 app.use(cors({
   credentials: true,
   origin(origin, callback) {
-    if (!origin || allowedOrigins.has(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
       return;
     }

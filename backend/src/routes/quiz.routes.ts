@@ -18,6 +18,7 @@ const quizAttemptLimit = rateLimit({
 });
 
 router.get("/", validate("query", paginationQuerySchema), asyncHandler(quizController.list));
+router.get("/:id", validate("params", idParamsSchema), asyncHandler(quizController.get));
 router.post(
   "/:id/attempts",
   authenticate,
