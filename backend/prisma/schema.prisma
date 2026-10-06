@@ -25,6 +25,7 @@ enum EnrollmentStatus {
   SUSPENDED
 }
 
+// Retained for backwards-compatible database history; quiz APIs and UI are removed.
 enum QuizQuestionType {
   SINGLE_CHOICE
   MULTIPLE_CHOICE

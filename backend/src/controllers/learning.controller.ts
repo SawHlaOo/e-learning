@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { Role } from "@prisma/client";
-import { exerciseService, lessonService, moduleService, progressService, quizService } from "../services";
+import { exerciseService, lessonService, moduleService, progressService } from "../services";
 import { success } from "../utils/http";
 import type { PageInput } from "../utils/pagination";
 import { validatedInput } from "../utils/request-input";
@@ -10,7 +10,6 @@ import type {
   createModuleBodySchema,
   exerciseSubmissionBodySchema,
   lessonProgressBodySchema,
-  quizAttemptBodySchema,
   updateLessonBodySchema,
   updateModuleBodySchema,
 } from "../validators/learning.validator";
@@ -81,30 +80,6 @@ export class ExerciseController {
   };
 }
 
-export class QuizController {
-  list = async (_req: Request, res: Response) => {
-    const page = validatedInput<z.infer<typeof paginationQuerySchema>>(res, "query") as PageInput;
-    const result = await quizService.list(page);
-    return success(res, result.items, 200, result.pagination);
-  };
-
-  get = async (req: Request, res: Response) => {
-    const { id } = validatedInput<z.infer<typeof idParamsSchema>>(res, "params");
-    return success(res, await quizService.get(id));
-  };
-
-  getResults = async (req: Request, res: Response) => {
-    const { id } = validatedInput<z.infer<typeof idParamsSchema>>(res, "params");
-    return success(res, await quizService.getResults(req.auth!.userId, id));
-  };
-
-  submit = async (req: Request, res: Response) => {
-    const { id } = validatedInput<z.infer<typeof idParamsSchema>>(res, "params");
-    const { answers } = validatedInput<z.infer<typeof quizAttemptBodySchema>>(res, "body");
-    return success(res, await quizService.submit(req.auth!.userId, id, answers), 201);
-  };
-}
-
 export class ProgressController {
   get = async (req: Request, res: Response) => {
     const page = validatedInput<z.infer<typeof paginationQuerySchema>>(res, "query") as PageInput;
@@ -121,5 +96,4 @@ export class ProgressController {
 export const moduleController = new ModuleController();
 export const lessonController = new LessonController();
 export const exerciseController = new ExerciseController();
-export const quizController = new QuizController();
 export const progressController = new ProgressController();

@@ -112,7 +112,7 @@ The seed command creates these local-only accounts:
 | Instructor | `instructor@example.com` | `Teach123!` |
 | Student | `student@example.com` | `Learn123!` |
 
-Override the default seed passwords with `SEED_ADMIN_PASSWORD`, `SEED_INSTRUCTOR_PASSWORD`, and `SEED_STUDENT_PASSWORD` before seeding if desired. These credentials are for development only. Change them before using any shared database; never rely on them in production. The seed refuses to run when `NODE_ENV=production`. It creates a beginner course, six modules, 30 lessons, 10 exercises, five quizzes, five projects, 10 cheat sheets, five unpublished sample video records, and achievement definitions.
+Override the default seed passwords with `SEED_ADMIN_PASSWORD`, `SEED_INSTRUCTOR_PASSWORD`, and `SEED_STUDENT_PASSWORD` before seeding if desired. These credentials are for development only. Change them before using any shared database; never rely on them in production. The seed refuses to run when `NODE_ENV=production`. It creates a beginner course, six modules, 30 lessons, 10 exercises, five projects, 10 cheat sheets, five unpublished sample video records, and achievement definitions.
 
 ## Database and Prisma
 
@@ -142,7 +142,6 @@ Backend variables (configure in `.env` locally and in the Vercel project environ
 | `LOG_LEVEL` | Optional structured backend log level (`info` by default in production) |
 | `API_RATE_WINDOW_MS`, `API_RATE_LIMIT` | Optional general API rate-limit window and request maximum |
 | `AUTH_RATE_WINDOW_MS`, `AUTH_RATE_LIMIT` | Optional authentication rate-limit window and maximum |
-| `QUIZ_RATE_WINDOW_MS`, `QUIZ_RATE_LIMIT` | Optional quiz-submission rate-limit window and maximum |
 
 Client variable (optional locally; Vite proxies `/api` if unset):
 
@@ -188,17 +187,14 @@ API resource responses use `{ "success": true, "data": ... }`. Errors use `{ "su
 | `POST`, `PUT`, `DELETE` | `/api/lessons`, `/api/lessons/:id` | Instructor/Admin |
 | `GET` | `/api/exercises`, `/api/exercises/:id` | Public (published content) |
 | `POST` | `/api/exercises/:id/submit` | Authenticated; stores code, does not execute it |
-| `GET`, `POST` | `/api/quizzes`, `/api/quizzes/:id/attempts` | Public quiz list; authenticated attempts |
-| `GET` | `/api/quizzes/:id/results` | Authenticated user's quiz-attempt summary; never exposes answer keys |
 | `GET`, `POST` | `/api/progress`, `/api/progress/lesson` | Authenticated |
 | `GET`, `POST`, `PUT`, `DELETE` | `/api/youtube`, `/api/youtube/:id` | Public reads; Instructor/Admin writes |
 | `GET` | `/api/certificates/verify/:code` | Public verification |
 | `GET` | `/api/certificates` | Authenticated user's certificates |
 | `GET` | `/api/admin/students`, `/api/admin/users`, `/api/admin/courses`, `/api/admin/analytics` | Admin only |
 | `GET` | `/api/admin/courses/:id` | Admin only; full course curriculum, including drafts |
-| `GET`, `POST`, `PUT`, `DELETE` | `/api/admin/quizzes`, `/api/admin/quizzes/:id`, `/api/admin/quiz-questions/:id` | Admin only |
 
-Paginated list endpoints accept `?page=1&limit=20` (maximum limit: 100). Existing array-valued `data` responses are preserved; pagination metadata is included alongside `data`. Quiz attempts remain repeatable learning attempts and are rate-limited; they are not silently made one-attempt-only.
+Paginated list endpoints accept `?page=1&limit=20` (maximum limit: 100). Existing array-valued `data` responses are preserved; pagination metadata is included alongside `data`.
 
 Authentication uses a signed, HttpOnly cookie (and accepts bearer tokens for API clients). Roles are looked up from PostgreSQL on protected requests; a frontend-supplied role is never trusted. Admin authorization is enforced by Express as well as by the frontend route guard.
 
@@ -212,4 +208,4 @@ Student-submitted Python is never run by Express. The current API stores submiss
 
 ## Current foundation scope
 
-This foundation includes the layered backend, data model, authentication, permissions, course/module/lesson management, exercise/quiz/progress, YouTube and admin APIs, certificate verification, pagination, structured logging, rate limits, and the frontend integration. Dashboard visualizations, password recovery, and database-backed integration tests are still future work. Database integration tests must target an isolated test database, never production user data.
+This foundation includes the layered backend, data model, authentication, permissions, course/module/lesson management, exercises/progress, YouTube and admin APIs, certificate verification, pagination, structured logging, rate limits, and the frontend integration. Dashboard visualizations, password recovery, and database-backed integration tests are still future work. Database integration tests must target an isolated test database, never production user data.

@@ -132,38 +132,9 @@ async function main() {
     })),
   });
 
-  const quizPrompts = [
-    ["What does print() do?", ["Displays a value", "Creates a variable", "Stops a loop", "Imports a module"], 0],
-    ["Which type represents whole numbers?", ["str", "int", "bool", "list"], 1],
-    ["Which keyword starts a conditional?", ["for", "def", "if", "return"], 2],
-    ["What does len(items) return?", ["The last item", "The number of items", "A sorted list", "The item type"], 1],
-    ["Which keyword defines a function?", ["class", "func", "lambda", "def"], 3],
-  ] as const;
-  for (const [index, [title, options, correctAnswer]] of quizPrompts.entries()) {
-    const quiz = await prisma.quiz.create({
-      data: {
-        title: `Python checkpoint ${index + 1}`,
-        description: "Check your understanding of the course fundamentals.",
-        published: true,
-        passingPercentage: 70,
-        lessonId: seededLessons[index]?.id,
-      },
-    });
-    await prisma.quizQuestion.create({
-      data: {
-        quizId: quiz.id,
-        prompt: title,
-        options: [...options],
-        correctAnswer,
-        order: 1,
-      },
-    });
-  }
-
   const projects = [
     ["Tip calculator", Difficulty.EASY],
     ["Number guessing game", Difficulty.EASY],
-    ["Command-line quiz", Difficulty.EASY],
     ["Personal expense tracker", Difficulty.MEDIUM],
     ["File organizer", Difficulty.MEDIUM],
   ] as const;

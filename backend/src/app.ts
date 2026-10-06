@@ -18,7 +18,6 @@ import exerciseRouter from "./routes/exercise.routes";
 import lessonRouter from "./routes/lesson.routes";
 import moduleRouter from "./routes/module.routes";
 import progressRouter from "./routes/progress.routes";
-import quizRouter from "./routes/quiz.routes";
 import youTubeRouter from "./routes/youtube.routes";
 
 const app = express();
@@ -94,7 +93,6 @@ app.use("/api/courses", courseRouter);
 app.use("/api/modules", moduleRouter);
 app.use("/api/lessons", lessonRouter);
 app.use("/api/exercises", exerciseRouter);
-app.use("/api/quizzes", quizRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/youtube", youTubeRouter);
 app.use("/api/admin", adminRouter);

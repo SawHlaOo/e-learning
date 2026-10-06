@@ -5,7 +5,6 @@ import {
   exerciseRepository,
   lessonRepository,
   progressRepository,
-  quizRepository,
 } from "../repositories/learning.repository";
 import { moduleRepository } from "../repositories/module.repository";
 import { userRepository } from "../repositories/user.repository";
@@ -18,7 +17,6 @@ import {
   ExerciseService,
   LessonService,
   ProgressService,
-  QuizService,
 } from "./learning.service";
 import { ModuleService } from "./module.service";
 import { YouTubeService } from "./youtube.service";
@@ -30,7 +28,6 @@ export const courseService = new CourseService(courseRepository);
 export const lessonService = new LessonService(lessonRepository);
 export const moduleService = new ModuleService(moduleRepository);
 export const exerciseService = new ExerciseService(exerciseRepository);
-export const quizService = new QuizService(quizRepository);
 export const progressService = new ProgressService(progressRepository);
 export const youTubeService = new YouTubeService(youTubeRepository);
 export const adminService = new AdminService(adminRepository);

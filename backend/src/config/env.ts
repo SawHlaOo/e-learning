@@ -33,8 +33,6 @@ const environmentSchema = z.object({
   API_RATE_LIMIT: integerSetting(300, 100_000),
   AUTH_RATE_WINDOW_MS: integerSetting(900_000, 86_400_000),
   AUTH_RATE_LIMIT: integerSetting(30, 10_000),
-  QUIZ_RATE_WINDOW_MS: integerSetting(60_000, 86_400_000),
-  QUIZ_RATE_LIMIT: integerSetting(10, 10_000),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).optional(),
 });
 

@@ -1,6 +1,5 @@
 import type { AdminRepository } from "../repositories/admin.repository";
 import { NotFoundError } from "../errors/app-error";
-import type { Prisma } from "@prisma/client";
 import { paginationResult, type PageInput } from "../utils/pagination";
 
 export class AdminService {
@@ -39,40 +38,4 @@ export class AdminService {
     return this.admin.setStudentStatus(id, isActive);
   }
 
-  quizzes() {
-    return this.admin.findQuizzes();
-  }
-
-  async quiz(id: string) {
-    const quiz = await this.admin.findQuiz(id);
-    if (!quiz) throw new NotFoundError("Quiz not found");
-    return quiz;
-  }
-
-  createQuiz(input: Prisma.QuizUncheckedCreateInput) {
-    return this.admin.createQuiz(input);
-  }
-
-  async updateQuiz(id: string, input: Prisma.QuizUpdateInput) {
-    await this.quiz(id);
-    return this.admin.updateQuiz(id, input);
-  }
-
-  async deleteQuiz(id: string) {
-    await this.quiz(id);
-    return this.admin.deleteQuiz(id);
-  }
-
-  async createQuizQuestion(quizId: string, input: Omit<Prisma.QuizQuestionUncheckedCreateInput, "quizId">) {
-    await this.quiz(quizId);
-    return this.admin.createQuizQuestion({ ...input, quizId });
-  }
-
-  async updateQuizQuestion(id: string, input: Prisma.QuizQuestionUpdateInput) {
-    return this.admin.updateQuizQuestion(id, input);
-  }
-
-  deleteQuizQuestion(id: string) {
-    return this.admin.deleteQuizQuestion(id);
-  }
 }

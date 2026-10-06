@@ -99,43 +99,6 @@ export class AdminRepository {
     });
   }
 
-  findQuizzes() {
-    return prisma.quiz.findMany({
-      orderBy: { createdAt: "desc" },
-      include: { lesson: { select: { id: true, title: true } }, _count: { select: { questions: true, attempts: true } } },
-    });
-  }
-
-  findQuiz(id: string) {
-    return prisma.quiz.findUnique({
-      where: { id },
-      include: { questions: { orderBy: { order: "asc" } }, lesson: { select: { id: true, title: true } } },
-    });
-  }
-
-  createQuiz(data: Prisma.QuizUncheckedCreateInput) {
-    return prisma.quiz.create({ data, include: { questions: true } });
-  }
-
-  updateQuiz(id: string, data: Prisma.QuizUpdateInput) {
-    return prisma.quiz.update({ where: { id }, data, include: { questions: true } });
-  }
-
-  deleteQuiz(id: string) {
-    return prisma.quiz.delete({ where: { id }, select: { id: true } });
-  }
-
-  createQuizQuestion(data: Prisma.QuizQuestionUncheckedCreateInput) {
-    return prisma.quizQuestion.create({ data });
-  }
-
-  updateQuizQuestion(id: string, data: Prisma.QuizQuestionUpdateInput) {
-    return prisma.quizQuestion.update({ where: { id }, data });
-  }
-
-  deleteQuizQuestion(id: string) {
-    return prisma.quizQuestion.delete({ where: { id }, select: { id: true } });
-  }
 }
 
 export const adminRepository = new AdminRepository();
