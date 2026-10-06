@@ -16,5 +16,6 @@ export interface LessonInput {
   published: boolean;
   durationMinutes: number;
   youtubeUrl?: string | null;
+  githubRepositoryUrl?: string | null;
   moduleId: string;
 }

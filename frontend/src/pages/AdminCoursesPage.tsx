@@ -30,6 +30,7 @@ const emptyLesson = {
   published: true,
   durationMinutes: 10,
   youtubeUrl: "",
+  githubRepositoryUrl: "",
 };
 
 function slugify(value: string, fallback: "course" | "lesson" = "course", minimumLength = 3) {
@@ -203,6 +204,7 @@ export function AdminCoursesPage() {
       published: lesson.published,
       durationMinutes: lesson.durationMinutes ?? 10,
       youtubeUrl: lesson.youtubeUrl ?? "",
+      githubRepositoryUrl: lesson.githubRepositoryUrl ?? "",
     });
   }
 
@@ -211,18 +213,20 @@ export function AdminCoursesPage() {
     setSaving(true);
     setError("");
     try {
-      const { youtubeUrl, ...lessonFields } = lessonDraft;
+      const { youtubeUrl, githubRepositoryUrl, ...lessonFields } = lessonDraft;
       const input: LessonInput = {
         ...lessonFields,
         slug: slugify(lessonDraft.slug || lessonDraft.title, "lesson", 2),
         moduleId: module.id,
         ...(youtubeUrl.trim() ? { youtubeUrl: youtubeUrl.trim() } : {}),
+        ...(githubRepositoryUrl.trim() ? { githubRepositoryUrl: githubRepositoryUrl.trim() } : {}),
       };
       if (editingLesson) {
         const update: Partial<LessonInput> = {
           ...lessonFields,
           slug: slugify(lessonDraft.slug || lessonDraft.title, "lesson", 2),
           youtubeUrl: youtubeUrl.trim() || null,
+          githubRepositoryUrl: githubRepositoryUrl.trim() || null,
         };
         await lessonService.update(editingLesson, update);
       } else {
@@ -370,7 +374,7 @@ export function AdminCoursesPage() {
                   {module.description && <p className="module-description">{module.description}</p>}
                   {module.lessons.map((lesson) => (
                     <div className="admin-lesson-row" key={lesson.id}>
-                      <div><strong>{lesson.order}. {lesson.title}</strong><span>{lesson.youtubeUrl ? "YouTube video added" : "No video"} · {lesson.published ? "Published" : "Draft"}</span></div>
+                      <div><strong>{lesson.order}. {lesson.title}</strong><span>{lesson.youtubeUrl ? "YouTube video added" : "No video"} · {lesson.githubRepositoryUrl ? "GitHub repo added" : "No repo"} · {lesson.published ? "Published" : "Draft"}</span></div>
                       <div className="admin-row-actions">
                         <button className="table-action" type="button" onClick={() => editLesson(lesson, module)}>Edit</button>
                         <button className="icon-action danger-action" type="button" aria-label={`Delete ${lesson.title}`} onClick={() => void deleteLesson(lesson, module)}><Trash2 size={15} /></button>
@@ -388,6 +392,9 @@ export function AdminCoursesPage() {
                       </label>
                       <label className="admin-field full-field">YouTube video URL
                         <input type="url" placeholder="https://www.youtube.com/watch?v=…" value={lessonDraft.youtubeUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, youtubeUrl: event.target.value }))} />
+                      </label>
+                      <label className="admin-field full-field">GitHub repository URL
+                        <input type="url" placeholder="https://github.com/owner/repository" value={lessonDraft.githubRepositoryUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, githubRepositoryUrl: event.target.value }))} />
                       </label>
                       <label className="admin-field full-field">Lesson content
                         <textarea rows={4} placeholder="Leave blank to use the standard lesson introduction." value={lessonDraft.content} onChange={(event) => setLessonDraft((draft) => ({ ...draft, content: event.target.value }))} />

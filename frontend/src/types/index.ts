@@ -42,6 +42,7 @@ export interface Lesson {
   order?: number;
   durationMinutes?: number;
   youtubeUrl?: string | null;
+  githubRepositoryUrl?: string | null;
   moduleId?: string;
   module?: { title: string; courseId: string };
 }
