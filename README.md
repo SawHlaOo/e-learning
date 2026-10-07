@@ -156,7 +156,7 @@ Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. 
 ## Vercel deployment
 
 1. Push the repository to GitHub.
-2. Create a Vercel project for the API. Select the repository and set **Root Directory** to `backend`. Use **Framework Preset: Other**. Vercel detects the exported Express app in `backend/src/app.ts` and serves the API routes without a path-stripping rewrite.
+2. Create a Vercel project for the API. Select the repository and set **Root Directory** to `backend`. Use **Framework Preset: Other**. Its `backend/vercel.json` builds the backend and routes API requests to the Express serverless function in `backend/api/index.ts`; non-API routes proxy to the frontend project.
 3. Add `DATABASE_URL` (Neon connection string), `JWT_SECRET` (strong random secret), `CLIENT_URL` (the exact frontend origin, e.g. `https://my-python-course.vercel.app`), and `NODE_ENV=production` to the **backend Vercel project**. Do not add `DATABASE_URL` or `JWT_SECRET` to the frontend project.
 4. Deploy the backend project and note its URL, for example `https://my-python-course-api.vercel.app`. Check `https://YOUR-API-DOMAIN.vercel.app/api/health`.
 5. Create a second Vercel project from the same repository. Set **Root Directory** to `frontend` and use **Framework Preset: Other**. The `frontend/vercel.json` builds the Vite app into `dist`, proxies `/api/*` to the backend project, and rewrites other routes to `index.html`. If either project URL changes, update the corresponding rewrite destinations in both Vercel configs.
@@ -166,7 +166,7 @@ Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. 
 9. Apply the checked-in database migrations to Neon using `npm run prisma:migrate` with `DATABASE_URL` configured for that database. The development seed refuses to run with `NODE_ENV=production`; do not seed the production database.
 10. Register/login, browse a published course, and verify that a non-admin is denied `/api/admin/*` and `/admin`.
 
-The frontend and Express API deploy independently. The API is exported from `backend/src/app.ts`; only the backend's local development entry point calls `app.listen()`. In production the frontend calls its own `/api` path, which Vercel proxies to the backend; local development can use `VITE_API_URL`. CORS permits the frontend origin configured in the backend's `CLIENT_URL`.
+The frontend and Express API deploy independently. The API is exported from `backend/api/index.ts`; only the backend's local development entry point calls `app.listen()`. In production the frontend calls its own `/api` path, which Vercel proxies to the backend; local development can use `VITE_API_URL`. CORS permits the frontend origin configured in the backend's `CLIENT_URL`.
 
 The built-in rate-limit store is in-memory and therefore applies per running process/function instance. For a multi-instance production deployment that needs a strict shared quota, configure a shared Redis-compatible rate-limit store before relying on limits as a global abuse-control boundary.
 
