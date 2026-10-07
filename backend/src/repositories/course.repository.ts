@@ -44,7 +44,7 @@ export class CourseRepository {
             lessons: {
               where: { published: true },
               orderBy: { order: "asc" },
-              select: { id: true, title: true, slug: true, order: true, durationMinutes: true },
+              select: { id: true, title: true, slug: true, order: true, durationMinutes: true, githubRepositoryUrl: true },
             },
           },
         },

@@ -60,6 +60,10 @@
 :root[data-theme="dark"] .lesson-row{border-color:#344239}
 :root[data-theme="dark"] .button-light{background:#202b23;border-color:#3a493d;color:#e5ece6}
 :root[data-theme="dark"] .auth-page{background:radial-gradient(ellipse at 50% 20%,#263524,transparent 42%),#151d18}
+.lesson-row-link{display:flex;flex:1;align-items:center;justify-content:space-between;gap:12px}
+.lesson-repository-link{display:inline-flex;align-items:center;gap:5px;color:#526b42;font-size:11px;white-space:nowrap}
+.lesson-repository-link:hover{text-decoration:underline}
+:root[data-theme="dark"] .lesson-repository-link{color:#b9ee78}
 :root[data-theme="dark"] .field{color:#d4ded5}
 :root[data-theme="dark"] .input-wrap{border-color:#3b493f;color:#a5b1a7}
 :root[data-theme="dark"] .input-wrap input{color:#e5ece6}
