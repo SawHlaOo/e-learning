@@ -156,7 +156,7 @@ Never use `VITE_DATABASE_URL`: Vite variables are public in the browser bundle. 
 ## Vercel deployment
 
 1. Push the repository to GitHub.
-2. Create a Vercel project for the API. Select the repository and set **Root Directory** to `backend`. Use **Framework Preset: Other**. Its `backend/vercel.json` builds the backend and routes API requests to the Express serverless function in `backend/api/index.ts`; non-API routes proxy to the frontend project.
+2. Create a Vercel project for the API. Select the repository and set **Root Directory** to `backend`. Use **Framework Preset: Other**. Its `backend/vercel.json` builds the backend and routes API requests to the Express serverless function in `backend/api/index.ts`; the build creates the configured `vercel-output` directory so Vercel's output-directory check passes, and non-API routes proxy to the frontend project.
 3. Add `DATABASE_URL` (Neon connection string), `JWT_SECRET` (strong random secret), `CLIENT_URL` (the exact frontend origin, e.g. `https://my-python-course.vercel.app`), and `NODE_ENV=production` to the **backend Vercel project**. Do not add `DATABASE_URL` or `JWT_SECRET` to the frontend project.
 4. Deploy the backend project and note its URL, for example `https://my-python-course-api.vercel.app`. Check `https://YOUR-API-DOMAIN.vercel.app/api/health`.
 5. Create a second Vercel project from the same repository. Set **Root Directory** to `frontend` and use **Framework Preset: Other**. The `frontend/vercel.json` builds the Vite app into `dist`, proxies `/api/*` to the backend project, and rewrites other routes to `index.html`. If either project URL changes, update the corresponding rewrite destinations in both Vercel configs.
