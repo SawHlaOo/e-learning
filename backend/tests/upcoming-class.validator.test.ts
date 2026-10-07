@@ -1,0 +1,67 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  createUpcomingClassBodySchema,
+  upcomingClassListQuerySchema,
+  updateUpcomingClassBodySchema,
+} from "../src/validators/upcoming-class.validator";
+import { effectiveClassStatus } from "../src/services/upcoming-class.service";
+
+const validClass = {
+  title: "Weekly Python workshop",
+  description: "Practice Python with an instructor.",
+  startsAt: "2026-11-01T09:00:00.000Z",
+  endsAt: "2026-11-01T10:00:00.000Z",
+  instructorId: "instructor-1",
+  status: "UPCOMING",
+};
+
+test("upcoming class accepts valid schedules and HTTP(S) meeting links", () => {
+  assert.equal(createUpcomingClassBodySchema.safeParse({
+    ...validClass,
+    meetingUrl: "https://meet.example.com/class",
+  }).success, true);
+  assert.equal(createUpcomingClassBodySchema.safeParse({
+    ...validClass,
+    meetingUrl: "javascript:alert(1)",
+  }).success, false);
+});
+
+test("upcoming class rejects invalid time ranges and participant limits", () => {
+  assert.equal(createUpcomingClassBodySchema.safeParse({
+    ...validClass,
+    startsAt: validClass.endsAt,
+  }).success, false);
+  assert.equal(createUpcomingClassBodySchema.safeParse({
+    ...validClass,
+    maxParticipants: 0,
+  }).success, false);
+});
+
+test("upcoming class updates require a field and accept valid status changes", () => {
+  assert.equal(updateUpcomingClassBodySchema.safeParse({}).success, false);
+  assert.equal(updateUpcomingClassBodySchema.safeParse({ status: "CANCELLED" }).success, true);
+  assert.equal(updateUpcomingClassBodySchema.safeParse({ status: "PUBLISHED" }).success, false);
+});
+
+test("class filters validate dates and sort direction", () => {
+  assert.equal(upcomingClassListQuerySchema.safeParse({ from: "2026-11-02", to: "2026-11-01" }).success, false);
+  assert.equal(upcomingClassListQuerySchema.safeParse({ status: "LIVE", sort: "desc" }).success, true);
+  assert.equal(upcomingClassListQuerySchema.safeParse({ sort: "random" }).success, false);
+});
+
+test("class status follows its schedule while preserving draft and cancelled states", () => {
+  const now = new Date("2026-11-01T09:30:00.000Z");
+  const schedule = {
+    startsAt: new Date("2026-11-01T09:00:00.000Z"),
+    endsAt: new Date("2026-11-01T10:00:00.000Z"),
+  };
+  assert.equal(effectiveClassStatus({ ...schedule, status: "UPCOMING" }, now), "LIVE");
+  assert.equal(effectiveClassStatus({
+    startsAt: new Date("2026-11-01T08:00:00.000Z"),
+    endsAt: new Date("2026-11-01T09:00:00.000Z"),
+    status: "UPCOMING",
+  }, now), "COMPLETED");
+  assert.equal(effectiveClassStatus({ ...schedule, status: "DRAFT" }, now), "DRAFT");
+  assert.equal(effectiveClassStatus({ ...schedule, status: "CANCELLED" }, now), "CANCELLED");
+});

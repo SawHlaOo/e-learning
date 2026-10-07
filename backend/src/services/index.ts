@@ -10,6 +10,7 @@ import {
 import { moduleRepository } from "../repositories/module.repository";
 import { userRepository } from "../repositories/user.repository";
 import { youTubeRepository } from "../repositories/youtube.repository";
+import { upcomingClassRepository } from "../repositories/upcoming-class.repository";
 import { AdminService } from "./admin.service";
 import { AuthService } from "./auth.service";
 import { CertificateService } from "./certificate.service";
@@ -23,6 +24,7 @@ import {
 import { ModuleService } from "./module.service";
 import { YouTubeService } from "./youtube.service";
 import { UserService } from "./user.service";
+import { UpcomingClassService } from "./upcoming-class.service";
 
 export const authService = new AuthService(userRepository);
 export const userService = new UserService(userRepository);
@@ -35,3 +37,4 @@ export const progressService = new ProgressService(progressRepository);
 export const youTubeService = new YouTubeService(youTubeRepository);
 export const adminService = new AdminService(adminRepository);
 export const certificateService = new CertificateService(certificateRepository);
+export const upcomingClassService = new UpcomingClassService(upcomingClassRepository);

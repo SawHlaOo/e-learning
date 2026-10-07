@@ -20,6 +20,7 @@ import learningResourceRouter from "./routes/learning-resource.routes";
 import moduleRouter from "./routes/module.routes";
 import progressRouter from "./routes/progress.routes";
 import youTubeRouter from "./routes/youtube.routes";
+import adminUpcomingClassRouter, { publicUpcomingClassRouter } from "./routes/upcoming-class.routes";
 
 const app = express();
 const devLocalOrigins = new Set([
@@ -96,7 +97,9 @@ app.use("/api/lessons", lessonRouter);
 app.use("/api/exercises", exerciseRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/youtube", youTubeRouter);
+app.use("/api/classes", publicUpcomingClassRouter);
 app.use("/api/admin/learning-resources", learningResourceRouter);
+app.use("/api/admin/classes", adminUpcomingClassRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/certificates", certificateRouter);
 app.use("/api", (_req, res) => {
