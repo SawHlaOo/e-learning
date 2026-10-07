@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { AdminPage, AdminStudentsPage, DashboardPage } from "./pages/DashboardPages";
 import { AdminCoursesPage } from "./pages/AdminCoursesPage";
+import { AdminLearningResourcesPage } from "./pages/AdminLearningResourcesPage";
 import { CourseDetailPage, LessonPage } from "./pages/DetailPages";
 import { AuthPage } from "./pages/AuthPage";
 import { CoursesPage } from "./pages/CoursesPage";
@@ -23,6 +24,7 @@ function SiteLayout() {
     <Route element={<ProtectedRoute admin />}>
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/courses" element={<AdminCoursesPage />} />
+      <Route path="/admin/learning-resources" element={<AdminLearningResourcesPage />} />
       <Route path="/admin/students" element={<AdminStudentsPage />} />
       <Route path="/admin/*" element={<AdminPage />} />
     </Route>

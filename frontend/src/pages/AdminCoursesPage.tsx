@@ -30,7 +30,6 @@ const emptyLesson = {
   published: true,
   durationMinutes: 10,
   youtubeUrl: "",
-  githubRepositoryUrl: "",
 };
 
 function slugify(value: string, fallback: "course" | "lesson" = "course", minimumLength = 3) {
@@ -61,7 +60,6 @@ export function AdminCoursesPage() {
   const [thumbnailImageFailed, setThumbnailImageFailed] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [lessonSaveError, setLessonSaveError] = useState("");
 
   const refreshCourses = useCallback(async () => {
     const items = await adminService.courses();
@@ -205,7 +203,6 @@ export function AdminCoursesPage() {
       published: lesson.published,
       durationMinutes: lesson.durationMinutes ?? 10,
       youtubeUrl: lesson.youtubeUrl ?? "",
-      githubRepositoryUrl: lesson.githubRepositoryUrl ?? "",
     });
   }
 
@@ -213,22 +210,19 @@ export function AdminCoursesPage() {
     event.preventDefault();
     setSaving(true);
     setError("");
-    setLessonSaveError("");
     try {
-      const { youtubeUrl, githubRepositoryUrl, ...lessonFields } = lessonDraft;
+      const { youtubeUrl, ...lessonFields } = lessonDraft;
       const input: LessonInput = {
         ...lessonFields,
         slug: slugify(lessonDraft.slug || lessonDraft.title, "lesson", 2),
         moduleId: module.id,
         ...(youtubeUrl.trim() ? { youtubeUrl: youtubeUrl.trim() } : {}),
-        ...(githubRepositoryUrl.trim() ? { githubRepositoryUrl: githubRepositoryUrl.trim() } : {}),
       };
       if (editingLesson) {
         const update: Partial<LessonInput> = {
           ...lessonFields,
           slug: slugify(lessonDraft.slug || lessonDraft.title, "lesson", 2),
           youtubeUrl: youtubeUrl.trim() || null,
-          githubRepositoryUrl: githubRepositoryUrl.trim() || null,
         };
         await lessonService.update(editingLesson, update);
       } else {
@@ -241,9 +235,7 @@ export function AdminCoursesPage() {
       setActiveLessonModule(null);
       setNotice(editingLesson ? "Lesson updated." : "Lesson created.");
     } catch (cause) {
-      const message = messageFrom(cause);
-      setError(message);
-      setLessonSaveError(message);
+      setError(messageFrom(cause));
     } finally {
       setSaving(false);
     }
@@ -378,18 +370,14 @@ export function AdminCoursesPage() {
                   {module.description && <p className="module-description">{module.description}</p>}
                   {module.lessons.map((lesson) => (
                     <div className="admin-lesson-row" key={lesson.id}>
-                      <div><strong>{lesson.order}. {lesson.title}</strong><span>{lesson.youtubeUrl ? "YouTube video added" : "No video"} · {lesson.githubRepositoryUrl ? "GitHub repo added" : "No repo"} · {lesson.published ? "Published" : "Draft"}</span></div>
+                      <div><strong>{lesson.order}. {lesson.title}</strong><span>{lesson.youtubeUrl ? "YouTube video added" : "No video"} · {lesson.published ? "Published" : "Draft"}</span></div>
                       <div className="admin-row-actions">
                         <button className="table-action" type="button" onClick={() => editLesson(lesson, module)}>Edit</button>
                         <button className="icon-action danger-action" type="button" aria-label={`Delete ${lesson.title}`} onClick={() => void deleteLesson(lesson, module)}><Trash2 size={15} /></button>
                       </div>
                     </div>
                   ))}
-                  {activeLessonModule === module.id && <form className="admin-inline-form" onSubmit={(event) => void saveLesson(event, module)} onChangeCapture={() => setLessonSaveError("")} onInvalidCapture={(event) => {
-                    if (event.target instanceof HTMLInputElement && !event.target.validity.valid) {
-                      setLessonSaveError(event.target.validationMessage);
-                    }
-                  }}>
+                  {activeLessonModule === module.id && <form className="admin-inline-form" onSubmit={(event) => void saveLesson(event, module)}>
                     <h4>{editingLesson ? "Edit lesson" : "Add a lesson"}</h4>
                     <div className="admin-form-grid">
                       <label className="admin-field">Lesson title
@@ -400,13 +388,6 @@ export function AdminCoursesPage() {
                       </label>
                       <label className="admin-field full-field">YouTube video URL
                         <input type="url" placeholder="https://www.youtube.com/watch?v=…" value={lessonDraft.youtubeUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, youtubeUrl: event.target.value }))} />
-                      </label>
-                      <label className="admin-field full-field">GitHub repository URL
-                        <input type="url" placeholder="https://github.com/owner/repository" value={lessonDraft.githubRepositoryUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, githubRepositoryUrl: event.target.value }))} onBlur={(event) => {
-                          const value = event.currentTarget.value.trim();
-                          const normalized = /^(?:www\.)?github\.com\//i.test(value) ? `https://${value}` : value;
-                          if (normalized !== event.currentTarget.value) setLessonDraft((draft) => ({ ...draft, githubRepositoryUrl: normalized }));
-                        }} />
                       </label>
                       <label className="admin-field full-field">Lesson content
                         <textarea rows={4} placeholder="Leave blank to use the standard lesson introduction." value={lessonDraft.content} onChange={(event) => setLessonDraft((draft) => ({ ...draft, content: event.target.value }))} />
@@ -419,7 +400,6 @@ export function AdminCoursesPage() {
                       </label>
                     </div>
                     <label className="admin-check"><input type="checkbox" checked={lessonDraft.published} onChange={(event) => setLessonDraft((draft) => ({ ...draft, published: event.target.checked }))} /> Publish lesson</label>
-                    {lessonSaveError && <div className="form-error" role="alert">{lessonSaveError}</div>}
                     <div className="admin-row-actions">
                       <button className="button button-dark" type="submit" disabled={saving}><Save size={15} /> Save lesson</button>
                       {editingLesson && <button className="button button-light" type="button" onClick={() => { setEditingLesson(null); setActiveLessonModule(null); setLessonDraft(emptyLesson); }}><X size={15} /> Cancel</button>}

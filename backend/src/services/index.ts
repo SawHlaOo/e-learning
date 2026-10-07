@@ -1,6 +1,7 @@
 import { adminRepository } from "../repositories/admin.repository";
 import { certificateRepository } from "../repositories/certificate.repository";
 import { courseRepository } from "../repositories/course.repository";
+import { learningResourceRepository } from "../repositories/learning-resource.repository";
 import {
   exerciseRepository,
   lessonRepository,
@@ -13,6 +14,7 @@ import { AdminService } from "./admin.service";
 import { AuthService } from "./auth.service";
 import { CertificateService } from "./certificate.service";
 import { CourseService } from "./course.service";
+import { LearningResourceService } from "./learning-resource.service";
 import {
   ExerciseService,
   LessonService,
@@ -26,6 +28,7 @@ export const authService = new AuthService(userRepository);
 export const userService = new UserService(userRepository);
 export const courseService = new CourseService(courseRepository);
 export const lessonService = new LessonService(lessonRepository);
+export const learningResourceService = new LearningResourceService(learningResourceRepository);
 export const moduleService = new ModuleService(moduleRepository);
 export const exerciseService = new ExerciseService(exerciseRepository);
 export const progressService = new ProgressService(progressRepository);

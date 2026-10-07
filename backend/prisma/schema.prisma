@@ -25,6 +25,17 @@ enum EnrollmentStatus {
   SUSPENDED
 }
 
+enum LearningResourceType {
+  GITHUB
+  YOUTUBE
+  DOCUMENTATION
+  ARTICLE
+  WEBSITE
+  COURSE
+  PDF
+  OTHER
+}
+
 // Retained for backwards-compatible database history; quiz APIs and UI are removed.
 enum QuizQuestionType {
   SINGLE_CHOICE
@@ -113,12 +124,31 @@ model Lesson {
   exercises       Exercise[]
   quizzes         Quiz[]
   youtubeVideos   YouTubeVideo[]
+  resources       LearningResource[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
   @@unique([moduleId, order])
   @@unique([moduleId, slug])
   @@index([published])
+}
+
+model LearningResource {
+  id          String               @id @default(cuid())
+  title       String
+  description String               @default("") @db.Text
+  url         String               @db.Text
+  type        LearningResourceType
+  thumbnail   String?
+  order       Int                  @default(1)
+  isPublished Boolean              @default(false)
+  lessonId    String
+  lesson      Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([lessonId, isPublished, order])
+  @@index([type, isPublished])
 }
 
 model Enrollment {

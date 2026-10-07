@@ -2,7 +2,7 @@
 
 PyPath is a modular learning platform starter built with React, Vite, TypeScript, Express, Prisma, and PostgreSQL. Frontend and backend live in separate `frontend/` and `backend/` folders, with independent package manifests and separate Vercel projects. The root package coordinates local development. The production database can be Neon PostgreSQL; no database URL or other secret is bundled in the frontend.
 
-The current foundation includes the responsive public site, layered backend, cookie-based registration/login, role-protected student/admin routes, server-side admin authorization, paginated learning APIs, and the complete learning-platform Prisma data model. Python submissions are stored but never executed by the API.
+The current foundation includes the responsive public site, layered backend, cookie-based registration/login, role-protected student/admin routes, server-side admin authorization, paginated learning APIs, lesson-level published learning resources with admin management, and the complete learning-platform Prisma data model. Python submissions are stored but never executed by the API.
 
 ## Technology and structure
 

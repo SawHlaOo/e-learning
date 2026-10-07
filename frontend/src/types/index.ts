@@ -1,4 +1,13 @@
 export type Role = "STUDENT" | "INSTRUCTOR" | "ADMIN";
+export type LearningResourceType =
+  | "GITHUB"
+  | "YOUTUBE"
+  | "DOCUMENTATION"
+  | "ARTICLE"
+  | "WEBSITE"
+  | "COURSE"
+  | "PDF"
+  | "OTHER";
 
 export interface User {
   id: string;
@@ -42,7 +51,30 @@ export interface Lesson {
   order?: number;
   durationMinutes?: number;
   youtubeUrl?: string | null;
-  githubRepositoryUrl?: string | null;
   moduleId?: string;
   module?: { title: string; courseId: string };
+  resources?: LearningResource[];
+}
+
+export interface LearningResource {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  type: LearningResourceType;
+  thumbnail?: string | null;
+  order: number;
+  isPublished?: boolean;
+  lessonId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  lesson?: {
+    id: string;
+    title: string;
+    module: {
+      id: string;
+      title: string;
+      course: { id: string; title: string };
+    };
+  };
 }

@@ -66,7 +66,22 @@ export class AdminRepository {
         modules: {
           orderBy: { order: "asc" },
           include: {
-            lessons: { orderBy: { order: "asc" } },
+            lessons: {
+              orderBy: { order: "asc" },
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                content: true,
+                order: true,
+                published: true,
+                durationMinutes: true,
+                youtubeUrl: true,
+                moduleId: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
           },
         },
       },

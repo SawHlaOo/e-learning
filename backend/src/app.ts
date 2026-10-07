@@ -16,6 +16,7 @@ import certificateRouter from "./routes/certificate.routes";
 import courseRouter from "./routes/course.routes";
 import exerciseRouter from "./routes/exercise.routes";
 import lessonRouter from "./routes/lesson.routes";
+import learningResourceRouter from "./routes/learning-resource.routes";
 import moduleRouter from "./routes/module.routes";
 import progressRouter from "./routes/progress.routes";
 import youTubeRouter from "./routes/youtube.routes";
@@ -95,6 +96,7 @@ app.use("/api/lessons", lessonRouter);
 app.use("/api/exercises", exerciseRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/youtube", youTubeRouter);
+app.use("/api/admin/learning-resources", learningResourceRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/certificates", certificateRouter);
 app.use("/api", (_req, res) => {
