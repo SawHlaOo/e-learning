@@ -61,6 +61,7 @@ export function AdminCoursesPage() {
   const [thumbnailImageFailed, setThumbnailImageFailed] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [lessonSaveError, setLessonSaveError] = useState("");
 
   const refreshCourses = useCallback(async () => {
     const items = await adminService.courses();
@@ -212,6 +213,7 @@ export function AdminCoursesPage() {
     event.preventDefault();
     setSaving(true);
     setError("");
+    setLessonSaveError("");
     try {
       const { youtubeUrl, githubRepositoryUrl, ...lessonFields } = lessonDraft;
       const input: LessonInput = {
@@ -239,7 +241,9 @@ export function AdminCoursesPage() {
       setActiveLessonModule(null);
       setNotice(editingLesson ? "Lesson updated." : "Lesson created.");
     } catch (cause) {
-      setError(messageFrom(cause));
+      const message = messageFrom(cause);
+      setError(message);
+      setLessonSaveError(message);
     } finally {
       setSaving(false);
     }
@@ -381,7 +385,11 @@ export function AdminCoursesPage() {
                       </div>
                     </div>
                   ))}
-                  {activeLessonModule === module.id && <form className="admin-inline-form" onSubmit={(event) => void saveLesson(event, module)}>
+                  {activeLessonModule === module.id && <form className="admin-inline-form" onSubmit={(event) => void saveLesson(event, module)} onChangeCapture={() => setLessonSaveError("")} onInvalidCapture={(event) => {
+                    if (event.target instanceof HTMLInputElement && !event.target.validity.valid) {
+                      setLessonSaveError(event.target.validationMessage);
+                    }
+                  }}>
                     <h4>{editingLesson ? "Edit lesson" : "Add a lesson"}</h4>
                     <div className="admin-form-grid">
                       <label className="admin-field">Lesson title
@@ -394,7 +402,11 @@ export function AdminCoursesPage() {
                         <input type="url" placeholder="https://www.youtube.com/watch?v=…" value={lessonDraft.youtubeUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, youtubeUrl: event.target.value }))} />
                       </label>
                       <label className="admin-field full-field">GitHub repository URL
-                        <input type="url" placeholder="https://github.com/owner/repository" value={lessonDraft.githubRepositoryUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, githubRepositoryUrl: event.target.value }))} />
+                        <input type="url" placeholder="https://github.com/owner/repository" value={lessonDraft.githubRepositoryUrl} onChange={(event) => setLessonDraft((draft) => ({ ...draft, githubRepositoryUrl: event.target.value }))} onBlur={(event) => {
+                          const value = event.currentTarget.value.trim();
+                          const normalized = /^(?:www\.)?github\.com\//i.test(value) ? `https://${value}` : value;
+                          if (normalized !== event.currentTarget.value) setLessonDraft((draft) => ({ ...draft, githubRepositoryUrl: normalized }));
+                        }} />
                       </label>
                       <label className="admin-field full-field">Lesson content
                         <textarea rows={4} placeholder="Leave blank to use the standard lesson introduction." value={lessonDraft.content} onChange={(event) => setLessonDraft((draft) => ({ ...draft, content: event.target.value }))} />
@@ -407,6 +419,7 @@ export function AdminCoursesPage() {
                       </label>
                     </div>
                     <label className="admin-check"><input type="checkbox" checked={lessonDraft.published} onChange={(event) => setLessonDraft((draft) => ({ ...draft, published: event.target.checked }))} /> Publish lesson</label>
+                    {lessonSaveError && <div className="form-error" role="alert">{lessonSaveError}</div>}
                     <div className="admin-row-actions">
                       <button className="button button-dark" type="submit" disabled={saving}><Save size={15} /> Save lesson</button>
                       {editingLesson && <button className="button button-light" type="button" onClick={() => { setEditingLesson(null); setActiveLessonModule(null); setLessonDraft(emptyLesson); }}><X size={15} /> Cancel</button>}
