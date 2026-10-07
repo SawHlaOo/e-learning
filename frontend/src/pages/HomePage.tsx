@@ -59,7 +59,7 @@ export function HomePage() {
             <div className="pill"><span className="pill-dot" /> A better way to learn, your way</div>
             <h1>Curiosity takes<br /><span>you anywhere.</span></h1>
             <p className="hero-description">Explore languages, science, creative skills, technology, and more—with clear lessons that help you grow at your own pace.</p>
-            <div className="hero-actions"><Link className="button button-dark" to="/classes">Upcoming classes <ArrowUpRight size={17} /></Link><Link className="button button-light" to="/courses">Explore courses <ArrowRight size={17} /></Link></div>
+            <div className="hero-actions"><Link className="button button-dark" to="/upcoming-classes">Upcoming classes <ArrowUpRight size={17} /></Link><Link className="button button-light" to="/courses">Explore courses <ArrowRight size={17} /></Link></div>
             <div className="hero-proof"><div className="avatar-stack"><span>A</span><span>M</span><span>J</span><span>+</span></div><span><strong>A little progress, every day.</strong><br />A learning path built around you.</span></div>
           </div>
           <div className="hero-visual" aria-label="Explore different learning subjects">

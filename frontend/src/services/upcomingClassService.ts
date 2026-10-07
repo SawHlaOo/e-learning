@@ -36,6 +36,10 @@ interface ClassPage {
 }
 
 export const upcomingClassService = {
+  classes: async (page = 1, limit = 12) => {
+    const response = await api.get<ClassPage>("/classes", { params: { page, limit } });
+    return { items: response.data.data, pagination: response.data.pagination };
+  },
   upcoming: async (page = 1, limit = 4) => {
     const response = await api.get<ClassPage>("/classes/upcoming", { params: { page, limit } });
     return { items: response.data.data, pagination: response.data.pagination };

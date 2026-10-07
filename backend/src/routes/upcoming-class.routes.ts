@@ -13,6 +13,11 @@ import {
 
 export const publicUpcomingClassRouter = Router();
 publicUpcomingClassRouter.get(
+  "/",
+  validate("query", upcomingClassListQuerySchema),
+  asyncHandler(upcomingClassController.listClasses),
+);
+publicUpcomingClassRouter.get(
   "/upcoming",
   validate("query", upcomingClassListQuerySchema),
   asyncHandler(upcomingClassController.listUpcoming),

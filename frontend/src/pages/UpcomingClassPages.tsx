@@ -7,13 +7,14 @@ import { upcomingClassService } from "../services/upcomingClassService";
 import type { UpcomingClass } from "../types";
 import { formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
-function BackLink({ fallback = "/classes" }: { fallback?: string }) {
+function BackLink({ fallback = "/upcoming-classes" }: { fallback?: string }) {
   const navigate = useNavigate();
   const location = useLocation();
   return <button className="class-back-button" type="button" onClick={() => { if (location.key === "default") navigate(fallback); else navigate(-1); }}><ArrowLeft size={17} /> Back</button>;
 }
 
-export function ClassesPage() {
+function ClassListPage({ basePath }: { basePath: "/classes" | "/upcoming-classes" }) {
+  const isUpcomingPage = basePath === "/upcoming-classes";
   const [classes, setClasses] = useState<UpcomingClass[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,7 +24,7 @@ export function ClassesPage() {
 
   useEffect(() => {
     let active = true;
-    upcomingClassService.upcoming(1, 12)
+    (isUpcomingPage ? upcomingClassService.upcoming(1, 12) : upcomingClassService.classes(1, 12))
       .then((result) => {
         if (!active) return;
         setClasses(result.items);
@@ -34,13 +35,15 @@ export function ClassesPage() {
       })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [isUpcomingPage]);
 
   async function loadMore() {
     setLoadingMore(true);
     setError("");
     try {
-      const result = await upcomingClassService.upcoming(page + 1, 12);
+      const result = isUpcomingPage
+        ? await upcomingClassService.upcoming(page + 1, 12)
+        : await upcomingClassService.classes(page + 1, 12);
       setClasses((current) => [...current, ...result.items]);
       setPage(result.pagination.page);
       setTotalPages(result.pagination.totalPages);
@@ -53,19 +56,29 @@ export function ClassesPage() {
 
   return <main className="classes-page section">
     <BackLink fallback="/" />
-    <div className="classes-page-heading"><span className="eyebrow">LEARN TOGETHER</span><h1>Upcoming <span>classes.</span></h1><p>Join a live class and learn alongside your community.</p></div>
+    <div className="classes-page-heading"><span className="eyebrow">LEARN TOGETHER</span><h1>{isUpcomingPage ? <>Upcoming <span>classes.</span></> : <>Explore <span>classes.</span></>}</h1><p>{isUpcomingPage ? "Join a live class and learn alongside your community." : "Browse instructor-led classes and their schedules."}</p></div>
     {loading ? <div className="page-state" role="status">Loading classes…</div>
       : error && !classes.length ? <div className="class-page-state" role="alert"><strong>Classes aren’t available right now.</strong><span>{error}</span><button className="button button-dark" onClick={() => window.location.reload()}>Try again</button></div>
         : classes.length ? <>
-          <div className="upcoming-classes-grid">{classes.map((item) => <UpcomingClassCard key={item.id} upcomingClass={item} />)}</div>
+          <div className="upcoming-classes-grid">{classes.map((item) => <UpcomingClassCard key={item.id} upcomingClass={item} detailPath={basePath} />)}</div>
           {error && <p className="form-error" role="alert">{error}</p>}
           {page < totalPages && <button className="button button-light classes-load-more" disabled={loadingMore} onClick={() => void loadMore()}>{loadingMore ? "Loading…" : "Load more classes"} <ArrowRight size={16} /></button>}
-        </> : <div className="upcoming-classes-empty"><CalendarDays size={24} /><strong>No upcoming classes at the moment.</strong><span>Check back soon for new classes.</span></div>}
+        </>         : <div className="upcoming-classes-empty"><CalendarDays size={24} /><strong>{isUpcomingPage ? "No upcoming classes at the moment." : "No classes are available at the moment."}</strong><span>{isUpcomingPage ? "Check back soon for new classes." : "Check back soon for classes and updates."}</span></div>}
   </main>;
+}
+
+export function ClassesPage() {
+  return <ClassListPage basePath="/classes" />;
+}
+
+export function UpcomingClassesPage() {
+  return <ClassListPage basePath="/upcoming-classes" />;
 }
 
 export function ClassDetailPage() {
   const { id = "" } = useParams();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith("/upcoming-classes/") ? "/upcoming-classes" : "/classes";
   const [upcomingClass, setUpcomingClass] = useState<UpcomingClass | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
@@ -90,15 +103,15 @@ export function ClassDetailPage() {
     return () => { active = false; window.clearInterval(timer); };
   }, [id, retry]);
 
-  if (loading) return <main className="class-detail-page section"><BackLink /><div className="page-state" role="status">Loading class…</div></main>;
-  if (notFound) return <main className="class-detail-page section"><BackLink /><div className="class-page-state"><strong>Class not found.</strong><span>This class may have been removed or is not available.</span><Link className="button button-dark" to="/classes">Browse classes</Link></div></main>;
-  if (error || !upcomingClass) return <main className="class-detail-page section"><BackLink /><div className="class-page-state" role="alert"><strong>We couldn’t load this class.</strong><span>{error || "Please try again later."}</span><button className="button button-dark" onClick={() => setRetry((count) => count + 1)}>Try again</button></div></main>;
+  if (loading) return <main className="class-detail-page section"><BackLink fallback={basePath} /><div className="page-state" role="status">Loading class…</div></main>;
+  if (notFound) return <main className="class-detail-page section"><BackLink fallback={basePath} /><div className="class-page-state"><strong>Class not found.</strong><span>This class may have been removed or is not available.</span><Link className="button button-dark" to={basePath}>Browse classes</Link></div></main>;
+  if (error || !upcomingClass) return <main className="class-detail-page section"><BackLink fallback={basePath} /><div className="class-page-state" role="alert"><strong>We couldn’t load this class.</strong><span>{error || "Please try again later."}</span><button className="button button-dark" onClick={() => setRetry((count) => count + 1)}>Try again</button></div></main>;
 
   const status = getClassStatus(upcomingClass, now);
   const canJoin = status === "LIVE" && Boolean(upcomingClass.meetingUrl);
 
   return <main className="class-detail-page section">
-    <BackLink />
+    <BackLink fallback={basePath} />
     <article className="class-detail-card">
       {upcomingClass.thumbnail && <img className="class-detail-image" src={upcomingClass.thumbnail} alt="" />}
       <div className="class-detail-content">

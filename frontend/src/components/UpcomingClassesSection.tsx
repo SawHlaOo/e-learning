@@ -13,7 +13,7 @@ export function UpcomingClassesSection({ compact = false }: { compact?: boolean 
 
   useEffect(() => {
     let active = true;
-    upcomingClassService.upcoming(4)
+    upcomingClassService.upcoming(1, 4)
       .then((result) => {
         if (!active) return;
         setClasses(result.items);
@@ -30,14 +30,14 @@ export function UpcomingClassesSection({ compact = false }: { compact?: boolean 
     <section className={`upcoming-classes-section section${compact ? " upcoming-classes-compact" : ""}`} aria-labelledby="upcoming-classes-title">
       <div className="section-heading">
         <div><span className="eyebrow">LEARN TOGETHER</span><h2 id="upcoming-classes-title">Upcoming <span>classes.</span></h2></div>
-        <Link className="text-link" to="/classes">{total > classes.length ? "View all" : "Browse classes"} <ArrowRight size={16} /></Link>
+        <Link className="text-link" to="/upcoming-classes">{total > classes.length ? "View all" : "Browse classes"} <ArrowRight size={16} /></Link>
       </div>
       {loading
         ? <div className="page-state" role="status">Loading upcoming classes…</div>
         : error
           ? <div className="upcoming-classes-empty" role="alert"><strong>Upcoming classes aren’t available right now.</strong><span>{error}</span></div>
           : classes.length
-            ? <div className="upcoming-classes-grid">{classes.map((item) => <UpcomingClassCard key={item.id} upcomingClass={item} />)}</div>
+            ? <div className="upcoming-classes-grid">{classes.map((item) => <UpcomingClassCard key={item.id} upcomingClass={item} detailPath="/upcoming-classes" />)}</div>
             : <div className="upcoming-classes-empty"><CalendarDays size={24} /><strong>No upcoming classes at the moment.</strong><span>Check back soon for new classes.</span></div>}
     </section>
   );

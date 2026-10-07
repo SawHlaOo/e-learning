@@ -19,6 +19,13 @@ export class UpcomingClassController {
     return success(res, result.items, 200, result.pagination);
   };
 
+  listClasses = async (_req: Request, res: Response) => {
+    const query = validatedInput<z.infer<typeof upcomingClassListQuerySchema>>(res, "query");
+    const page: PageInput = { page: query.page, limit: query.limit };
+    const result = await upcomingClassService.publicClasses(page);
+    return success(res, result.items, 200, result.pagination);
+  };
+
   listAdmin = async (_req: Request, res: Response) => {
     const query = validatedInput<z.infer<typeof upcomingClassListQuerySchema>>(res, "query");
     const result = await upcomingClassService.list(query);

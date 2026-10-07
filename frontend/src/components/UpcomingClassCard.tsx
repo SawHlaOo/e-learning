@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import type { UpcomingClass } from "../types";
 import { formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
-export function UpcomingClassCard({ upcomingClass }: { upcomingClass: UpcomingClass }) {
+export function UpcomingClassCard({ upcomingClass, detailPath = "/classes" }: { upcomingClass: UpcomingClass; detailPath?: string }) {
   const status = getClassStatus(upcomingClass);
   return (
     <article className="upcoming-class-card">
@@ -21,7 +21,7 @@ export function UpcomingClassCard({ upcomingClass }: { upcomingClass: UpcomingCl
           <span><CalendarDays size={15} />{formatClassSchedule(upcomingClass.daysOfWeek, upcomingClass.startDate, upcomingClass.endDate, upcomingClass.startTime, upcomingClass.endTime)}</span>
           <span><UserRound size={15} />{upcomingClass.instructorName || "Instructor to be announced"}</span>
         </div>
-        <Link className="button button-dark upcoming-class-view" to={`/classes/${upcomingClass.id}`}>View details <ArrowRight size={16} /></Link>
+        <Link className="button button-dark upcoming-class-view" to={`${detailPath}/${upcomingClass.id}`}>View details <ArrowRight size={16} /></Link>
       </div>
     </article>
   );

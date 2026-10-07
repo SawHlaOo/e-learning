@@ -10,10 +10,11 @@ export function getClassStatus(
   const recurring = upcomingClass as UpcomingClass;
   if (recurring.startDate && recurring.endDate && recurring.startTime && recurring.endTime && recurring.daysOfWeek.length) {
     const date = now.toISOString().slice(0, 10);
-    if (date > recurring.endDate || (date === recurring.endDate && now.toTimeString().slice(0, 5) > recurring.endTime)) return "COMPLETED";
-    if (date < recurring.startDate || (date === recurring.startDate && now.toTimeString().slice(0, 5) < recurring.startTime)) return "UPCOMING";
-    const day = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][now.getDay()];
-    if (recurring.daysOfWeek.includes(day) && now.toTimeString().slice(0, 5) >= recurring.startTime && now.toTimeString().slice(0, 5) < recurring.endTime) return "LIVE";
+    const time = now.toISOString().slice(11, 16);
+    if (date > recurring.endDate || (date === recurring.endDate && time > recurring.endTime)) return "COMPLETED";
+    if (date < recurring.startDate || (date === recurring.startDate && time < recurring.startTime)) return "UPCOMING";
+    const utcDay = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][now.getUTCDay()];
+    if (recurring.daysOfWeek.includes(utcDay) && time >= recurring.startTime && time < recurring.endTime) return "LIVE";
     return "UPCOMING";
   }
   const start = new Date(upcomingClass.startsAt);
@@ -56,5 +57,5 @@ export function formatClassSchedule(days: string[], startDate: string | null, en
   const labels: Record<string, string> = { SUNDAY: "Sun", MONDAY: "Mon", TUESDAY: "Tue", WEDNESDAY: "Wed", THURSDAY: "Thu", FRIDAY: "Fri", SATURDAY: "Sat" };
   const dayText = days.map((day) => labels[day] ?? day).join(", ");
   if (!startDate || !endDate || !startTime || !endTime) return `${dayText} · Schedule unavailable`;
-  return `${dayText} · ${startDate} to ${endDate} · ${startTime}–${endTime}`;
+  return `${dayText} · ${startDate.slice(0, 10)} to ${endDate.slice(0, 10)} · ${startTime}–${endTime}`;
 }

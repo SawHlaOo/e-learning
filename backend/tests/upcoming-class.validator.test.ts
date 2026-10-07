@@ -10,9 +10,12 @@ import { effectiveClassStatus } from "../src/services/upcoming-class.service";
 const validClass = {
   title: "Weekly Python workshop",
   description: "Practice Python with an instructor.",
-  startsAt: "2026-11-01T09:00:00.000Z",
-  endsAt: "2026-11-01T10:00:00.000Z",
-  instructorId: "instructor-1",
+  instructorName: "Ada Instructor",
+  daysOfWeek: ["SUNDAY"],
+  startDate: "2026-11-01",
+  endDate: "2026-11-29",
+  startTime: "09:00",
+  endTime: "10:00",
   status: "UPCOMING",
 };
 
@@ -30,7 +33,7 @@ test("upcoming class accepts valid schedules and HTTP(S) meeting links", () => {
 test("upcoming class rejects invalid time ranges and participant limits", () => {
   assert.equal(createUpcomingClassBodySchema.safeParse({
     ...validClass,
-    startsAt: validClass.endsAt,
+    endTime: validClass.startTime,
   }).success, false);
   assert.equal(createUpcomingClassBodySchema.safeParse({
     ...validClass,
@@ -55,11 +58,21 @@ test("class status follows its schedule while preserving draft and cancelled sta
   const schedule = {
     startsAt: new Date("2026-11-01T09:00:00.000Z"),
     endsAt: new Date("2026-11-01T10:00:00.000Z"),
+    startDate: new Date("2026-11-01T00:00:00.000Z"),
+    endDate: new Date("2026-11-29T00:00:00.000Z"),
+    startTime: "09:00",
+    endTime: "10:00",
+    daysOfWeek: ["SUNDAY"],
   };
   assert.equal(effectiveClassStatus({ ...schedule, status: "UPCOMING" }, now), "LIVE");
   assert.equal(effectiveClassStatus({
     startsAt: new Date("2026-11-01T08:00:00.000Z"),
     endsAt: new Date("2026-11-01T09:00:00.000Z"),
+    startDate: new Date("2026-10-01T00:00:00.000Z"),
+    endDate: new Date("2026-10-25T00:00:00.000Z"),
+    startTime: "08:00",
+    endTime: "09:00",
+    daysOfWeek: ["SUNDAY"],
     status: "UPCOMING",
   }, now), "COMPLETED");
   assert.equal(effectiveClassStatus({ ...schedule, status: "DRAFT" }, now), "DRAFT");

@@ -1,5 +1,5 @@
 import { UpcomingClassStatus, type Prisma } from "@prisma/client";
-import { NotFoundError } from "../errors/app-error";
+import { NotFoundError, ValidationError } from "../errors/app-error";
 import type { UpcomingClassFilters } from "../repositories/upcoming-class.repository";
 import type { UpcomingClassRepository } from "../repositories/upcoming-class.repository";
 import { paginationResult, type PageInput } from "../utils/pagination";
@@ -55,11 +55,9 @@ export class UpcomingClassService {
 
   async list(filters: UpcomingClassFilters) {
     const result = await this.classes.findMany(filters);
-    const page: PageInput = { page: filters.page, limit: filters.limit };
-    const now = new Date();
     return {
-      items: result.items.map((item) => ({ ...item, status: effectiveClassStatus(item, now) })),
-      pagination: paginationResult(page, result.total),
+      items: result.items,
+      pagination: paginationResult({ page: filters.page, limit: filters.limit }, result.total),
     };
   }
 
@@ -71,12 +69,22 @@ export class UpcomingClassService {
     };
   }
 
+  async publicClasses(page: PageInput) {
+    const result = await this.classes.findClasses(page);
+    return {
+      items: result.items.map((item) => ({ ...item, meetingUrl: null, status: effectiveClassStatus(item) })),
+      pagination: paginationResult(page, result.total),
+    };
+  }
+
   async get(id: string, admin = false) {
+    const now = new Date();
     const item = admin
       ? await this.classes.findById(id)
-      : await this.classes.findPublishedById(id);
+      : await this.classes.findPublicById(id);
     if (!item) throw new NotFoundError("Class not found");
-    const result = present(item);
+    if (admin) return item;
+    const result = present(item, now);
     if (!admin && result && result.status !== UpcomingClassStatus.LIVE) {
       return { ...result, meetingUrl: null };
     }
@@ -85,14 +93,17 @@ export class UpcomingClassService {
 
   async create(input: UpcomingClassInput) {
     if (input.instructorId) await this.assertRelations(input.instructorId, input.courseId);
+    else if (input.courseId && !await this.classes.findCourse(input.courseId)) {
+      throw new NotFoundError("Course not found");
+    }
     const data: Prisma.UpcomingClassUncheckedCreateInput = {
       title: input.title.trim(),
       description: input.description.trim(),
       thumbnail: input.thumbnail?.trim() || null,
       instructorName: input.instructorName.trim(),
       daysOfWeek: input.daysOfWeek,
-      startDate: new Date(`${input.startDate}T00:00:00`),
-      endDate: new Date(`${input.endDate}T00:00:00`),
+      startDate: new Date(`${input.startDate}T00:00:00.000Z`),
+      endDate: new Date(`${input.endDate}T00:00:00.000Z`),
       startTime: input.startTime,
       endTime: input.endTime,
       startsAt: boundaryDate(input.startDate, input.startTime),
@@ -114,6 +125,9 @@ export class UpcomingClassService {
     if (!current) throw new NotFoundError("Class not found");
     if (input.instructorId !== undefined || input.courseId !== undefined) {
       if (input.instructorId) await this.assertRelations(input.instructorId, input.courseId ?? current.courseId);
+      if (input.courseId && !await this.classes.findCourse(input.courseId)) {
+        throw new NotFoundError("Course not found");
+      }
     }
     const schedule = {
       startDate: input.startDate ?? dateKey(current.startDate ?? current.startsAt),
@@ -121,21 +135,27 @@ export class UpcomingClassService {
       startTime: input.startTime ?? current.startTime ?? timeKey(current.startsAt),
       endTime: input.endTime ?? current.endTime ?? timeKey(current.endsAt),
     };
+    const scheduleErrors: Record<string, string[]> = {};
+    if (schedule.endDate < schedule.startDate) scheduleErrors.endDate = ["End date must be on or after start date"];
+    if (schedule.endTime <= schedule.startTime) {
+      scheduleErrors.endTime = ["End time must be after start time"];
+    }
+    if (Object.keys(scheduleErrors).length) throw new ValidationError("Invalid class schedule", scheduleErrors);
     const data: Prisma.UpcomingClassUncheckedUpdateInput = {
       ...(input.title !== undefined ? { title: input.title.trim() } : {}),
       ...(input.description !== undefined ? { description: input.description.trim() } : {}),
-      ...(input.thumbnail !== undefined ? { thumbnail: input.thumbnail?.trim() || null } : {}),
+      ...(input.thumbnail?.trim() ? { thumbnail: input.thumbnail.trim() } : {}),
       ...(input.instructorName !== undefined ? { instructorName: input.instructorName.trim() } : {}),
       ...(input.daysOfWeek !== undefined ? { daysOfWeek: input.daysOfWeek } : {}),
       ...((input.startDate !== undefined || input.endDate !== undefined || input.startTime !== undefined || input.endTime !== undefined)
-        ? { startDate: new Date(`${schedule.startDate}T00:00:00`), endDate: new Date(`${schedule.endDate}T00:00:00`), startTime: schedule.startTime, endTime: schedule.endTime, startsAt: boundaryDate(schedule.startDate, schedule.startTime), endsAt: boundaryDate(schedule.endDate, schedule.endTime) }
+        ? { startDate: new Date(`${schedule.startDate}T00:00:00.000Z`), endDate: new Date(`${schedule.endDate}T00:00:00.000Z`), startTime: schedule.startTime, endTime: schedule.endTime, startsAt: boundaryDate(schedule.startDate, schedule.startTime), endsAt: boundaryDate(schedule.endDate, schedule.endTime) }
         : {}),
-      ...(input.instructorId !== undefined ? { instructorId: input.instructorId || null } : {}),
-      ...(input.courseId !== undefined ? { courseId: input.courseId || null } : {}),
-      ...(input.meetingUrl !== undefined ? { meetingUrl: input.meetingUrl?.trim() || null } : {}),
-      ...(input.meetingPlatform !== undefined ? { meetingPlatform: input.meetingPlatform?.trim() || null } : {}),
-      ...(input.maxParticipants !== undefined ? { maxParticipants: input.maxParticipants } : {}),
-      ...(input.notes !== undefined ? { notes: input.notes?.trim() || null } : {}),
+      ...(input.instructorId?.trim() ? { instructorId: input.instructorId.trim() } : {}),
+      ...(input.courseId?.trim() ? { courseId: input.courseId.trim() } : {}),
+      ...(input.meetingUrl?.trim() ? { meetingUrl: input.meetingUrl.trim() } : {}),
+      ...(input.meetingPlatform?.trim() ? { meetingPlatform: input.meetingPlatform.trim() } : {}),
+      ...(input.maxParticipants !== undefined && input.maxParticipants !== null ? { maxParticipants: input.maxParticipants } : {}),
+      ...(input.notes?.trim() ? { notes: input.notes.trim() } : {}),
       ...(input.status !== undefined ? { status: input.status } : {}),
     };
     return this.classes.update(id, data);
@@ -157,7 +177,7 @@ export class UpcomingClassService {
 }
 
 function boundaryDate(date: string, time: string) {
-  return new Date(`${date}T${time}:00`);
+  return new Date(`${date}T${time}:00.000Z`);
 }
 
 function dateKey(value: Date) {
@@ -169,9 +189,9 @@ function timeKey(value: Date) {
 }
 
 function currentTime(value: Date) {
-  return `${String(value.getHours()).padStart(2, "0")}:${String(value.getMinutes()).padStart(2, "0")}`;
+  return `${String(value.getUTCHours()).padStart(2, "0")}:${String(value.getUTCMinutes()).padStart(2, "0")}`;
 }
 
 function dayName(value: Date) {
-  return ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][value.getDay()];
+  return ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][value.getUTCDay()];
 }

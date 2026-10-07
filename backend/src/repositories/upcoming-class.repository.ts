@@ -39,9 +39,8 @@ const publicUpcomingSelection = { ...classSelection, meetingUrl: false } satisfi
 
 export class UpcomingClassRepository {
   async findMany(filters: UpcomingClassFilters) {
-    const now = new Date();
     const where: Prisma.UpcomingClassWhereInput = {
-      ...(filters.status ? { AND: [statusFilter(filters.status, now)] } : {}),
+      ...(filters.status ? { status: filters.status } : {}),
       ...(filters.search ? {
         OR: [
           { title: { contains: filters.search, mode: "insensitive" } },
@@ -73,7 +72,7 @@ export class UpcomingClassRepository {
 
   findUpcoming(now: Date, page: PageInput) {
     const where: Prisma.UpcomingClassWhereInput = {
-      status: { notIn: [UpcomingClassStatus.DRAFT, UpcomingClassStatus.CANCELLED] },
+      status: UpcomingClassStatus.UPCOMING,
       endsAt: { gte: now },
     };
     return prisma.$transaction([
@@ -88,11 +87,27 @@ export class UpcomingClassRepository {
     ]).then(([items, total]) => ({ items, total }));
   }
 
+  findClasses(page: PageInput) {
+    const where: Prisma.UpcomingClassWhereInput = {
+      status: { in: [UpcomingClassStatus.LIVE, UpcomingClassStatus.COMPLETED, UpcomingClassStatus.CANCELLED] },
+    };
+    return prisma.$transaction([
+      prisma.upcomingClass.findMany({
+        where,
+        skip: (page.page - 1) * page.limit,
+        take: page.limit,
+        select: publicUpcomingSelection,
+        orderBy: [{ startsAt: "desc" }, { endsAt: "desc" }],
+      }),
+      prisma.upcomingClass.count({ where }),
+    ]).then(([items, total]) => ({ items, total }));
+  }
+
   findById(id: string) {
     return prisma.upcomingClass.findUnique({ where: { id }, select: classSelection });
   }
 
-  findPublishedById(id: string) {
+  findPublicById(id: string) {
     return prisma.upcomingClass.findFirst({
       where: {
         id,
@@ -126,23 +141,9 @@ export class UpcomingClassRepository {
   }
 }
 
-function statusFilter(status: UpcomingClassStatus, now: Date): Prisma.UpcomingClassWhereInput {
-  if (status === UpcomingClassStatus.DRAFT || status === UpcomingClassStatus.CANCELLED) {
-    return { status };
-  }
-  const activeStatuses = { notIn: [UpcomingClassStatus.DRAFT, UpcomingClassStatus.CANCELLED] };
-  if (status === UpcomingClassStatus.UPCOMING) {
-    return { status: activeStatuses, startsAt: { gt: now }, endsAt: { gt: now } };
-  }
-  if (status === UpcomingClassStatus.LIVE) {
-    return { status: activeStatuses, startsAt: { lte: now }, endsAt: { gt: now } };
-  }
-  return { status: activeStatuses, endsAt: { lte: now } };
-}
-
 function endOfFilterDay(value: string) {
   const date = new Date(value);
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) date.setHours(23, 59, 59, 999);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) date.setUTCHours(23, 59, 59, 999);
   return date;
 }
 

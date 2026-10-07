@@ -17,7 +17,7 @@ const httpUrlSchema = z.string().trim().pipe(z.url()).refine(
 const optionalHttpUrlSchema = z.union([z.literal(""), httpUrlSchema]).nullable().optional();
 const weekDaySchema = z.enum(["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"]);
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Provide a valid date").refine((value) => {
-  const date = new Date(`${value}T00:00:00`);
+  const date = new Date(`${value}T00:00:00.000Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }, "Provide a valid date");
 const timeSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Provide a valid time");
@@ -48,7 +48,7 @@ function validateSchedule<T extends { startDate?: string; endDate?: string; star
   if (value.startDate && value.endDate && value.startDate > value.endDate) {
     context.addIssue({ code: "custom", path: ["endDate"], message: "End date must be on or after start date" });
   }
-  if (value.startDate === value.endDate && value.startTime && value.endTime && value.startTime >= value.endTime) {
+  if (value.startTime && value.endTime && value.startTime >= value.endTime) {
     context.addIssue({ code: "custom", path: ["endTime"], message: "End time must be after start time" });
   }
 }

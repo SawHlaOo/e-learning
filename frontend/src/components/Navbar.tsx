@@ -30,6 +30,7 @@ export function Navbar() {
         <nav className={menuOpen ? "nav-links open" : "nav-links"}>
           <NavLink to="/courses" onClick={() => setMenuOpen(false)}>Courses</NavLink>
           <NavLink to="/classes" onClick={() => setMenuOpen(false)}>Classes</NavLink>
+          <NavLink to="/upcoming-classes" onClick={() => setMenuOpen(false)}>Upcoming Classes</NavLink>
           <a href="/#roadmap" onClick={() => setMenuOpen(false)}>How it works</a>
           {user ? (
             <>
