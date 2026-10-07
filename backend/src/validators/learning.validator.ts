@@ -10,7 +10,7 @@ export const youtubeUrlSchema = z.url().refine((value) => {
     : /^\/(?:embed|shorts|live)\/[^/]+/.test(url.pathname);
 }, "Enter a valid YouTube video URL");
 
-export const githubRepositoryUrlSchema = z.url().refine((value) => {
+export const githubRepositoryUrlSchema = z.string().trim().pipe(z.url()).refine((value) => {
   const url = new URL(value);
   if (url.protocol !== "https:") return false;
   if (!["github.com", "www.github.com"].includes(url.hostname.toLowerCase())) return false;
