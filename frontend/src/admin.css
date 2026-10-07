@@ -22,6 +22,7 @@
 @media(max-width:900px){.resource-admin-layout{grid-template-columns:minmax(0,1fr)}.resource-filter-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.learning-resource-cards{grid-template-columns:minmax(0,1fr)}.resource-admin-item{align-items:flex-start;flex-direction:column}.resource-admin-item .admin-row-actions{flex-wrap:wrap}.resource-filter-card{padding:14px}.resource-filter-form{grid-template-columns:minmax(0,1fr)}.resource-list-panel,.resource-editor{padding:15px}.resource-list-heading{align-items:flex-start}.resource-list-heading .button{white-space:nowrap}.resource-editor-actions{align-items:stretch;flex-direction:column}.resource-editor-actions .button{width:100%}}
 :root[data-theme="dark"] .resource-list-panel,:root[data-theme="dark"] .resource-editor,:root[data-theme="dark"] .resource-filter-card,:root[data-theme="dark"] .learning-resource-card{background:#1c261f;border-color:#344239;color:#e5ece6}
+.learning-resource-thumbnail{display:block;flex:0 0 92px;width:92px;height:68px;object-fit:cover;border-radius:8px;background:#f1f4ef}
 :root[data-theme="dark"] .resource-admin-item{border-color:#344239}
 :root[data-theme="dark"] .resource-list-heading h2,:root[data-theme="dark"] .resource-admin-copy h3,:root[data-theme="dark"] .learning-resources-heading h2,:root[data-theme="dark"] .learning-resource-copy h3{color:#e5ece6}
 :root[data-theme="dark"] .learning-resource-copy p,:root[data-theme="dark"] .resource-admin-copy p{color:#aebbb0}
