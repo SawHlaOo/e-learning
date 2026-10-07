@@ -5,14 +5,6 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/admin/learning-resources",
-      "destination": "https://e-learning-nyc7.vercel.app/api/admin/learning-resources"
-    },
-    {
-      "source": "/api/admin/learning-resources/(.*)",
-      "destination": "https://e-learning-nyc7.vercel.app/api/admin/learning-resources/$1"
-    },
-    {
       "source": "/api/(.*)",
       "destination": "https://e-learning-nyc7.vercel.app/api/$1"
     },
