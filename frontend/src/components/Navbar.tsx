@@ -29,6 +29,7 @@ export function Navbar() {
         <Link className="brand brand-logo" to="/" aria-label="Your Choice Tech home" onClick={() => setMenuOpen(false)}><BrandLogo /></Link>
         <nav className={menuOpen ? "nav-links open" : "nav-links"}>
           <NavLink to="/courses" onClick={() => setMenuOpen(false)}>Courses</NavLink>
+          <NavLink to="/classes" onClick={() => setMenuOpen(false)}>Classes</NavLink>
           <a href="/#roadmap" onClick={() => setMenuOpen(false)}>How it works</a>
           {user ? (
             <>

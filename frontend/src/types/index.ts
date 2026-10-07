@@ -78,3 +78,29 @@ export interface LearningResource {
     };
   };
 }
+
+export type UpcomingClassStatus = "DRAFT" | "UPCOMING" | "LIVE" | "COMPLETED" | "CANCELLED";
+
+export interface UpcomingClass {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string | null;
+  instructorName: string;
+  daysOfWeek: string[];
+  startDate: string | null;
+  endDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  startsAt: string;
+  endsAt: string;
+  instructorId: string | null;
+  courseId: string | null;
+  meetingUrl: string | null;
+  meetingPlatform: string | null;
+  maxParticipants: number | null;
+  notes?: string | null;
+  status: UpcomingClassStatus;
+  instructor: { id: string; name: string } | null;
+  course: { id: string; title: string; thumbnail: string | null } | null;
+}

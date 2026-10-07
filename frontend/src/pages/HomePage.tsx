@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "../components/BrandLogo";
 import { CourseCard } from "../components/CourseCard";
+import { UpcomingClassesSection } from "../components/UpcomingClassesSection";
 import { courseService } from "../services/courseService";
 import type { Course } from "../types";
 
@@ -58,7 +59,7 @@ export function HomePage() {
             <div className="pill"><span className="pill-dot" /> A better way to learn, your way</div>
             <h1>Curiosity takes<br /><span>you anywhere.</span></h1>
             <p className="hero-description">Explore languages, science, creative skills, technology, and more—with clear lessons that help you grow at your own pace.</p>
-            <div className="hero-actions"><Link className="button button-dark" to="/courses">Start learning <ArrowUpRight size={17} /></Link><Link className="button button-light" to="/courses">Explore courses <ArrowRight size={17} /></Link></div>
+            <div className="hero-actions"><Link className="button button-dark" to="/classes">Upcoming classes <ArrowUpRight size={17} /></Link><Link className="button button-light" to="/courses">Explore courses <ArrowRight size={17} /></Link></div>
             <div className="hero-proof"><div className="avatar-stack"><span>A</span><span>M</span><span>J</span><span>+</span></div><span><strong>A little progress, every day.</strong><br />A learning path built around you.</span></div>
           </div>
           <div className="hero-visual" aria-label="Explore different learning subjects">
@@ -85,6 +86,7 @@ export function HomePage() {
         {courses.length ? <div className="course-grid">{courses.slice(0, 3).map((course, index) => <CourseCard key={course.id} course={course} index={index} />)}</div> : coursesLoading ? <div className="page-state">Loading courses…</div> : coursesError ? <div className="page-state"><strong>Courses aren’t available right now.</strong><span>{coursesError}</span></div> : <div className="empty-courses"><div className="empty-icon"><BookOpen size={24} /></div><div><strong>Your learning journey starts here.</strong><p>New courses will appear here as they’re published.</p></div><Link to="/register" className="text-link">Create your account <ArrowRight size={16} /></Link></div>}
       </section>
 
+      <UpcomingClassesSection />
       <section className="cta-section"><div className="cta-decoration"><Sparkles /></div><div><span className="eyebrow">READY WHEN YOU ARE</span><h2>Your next new skill<br />is closer than you think.</h2></div><Link className="button button-green" to="/register">Let’s get started <ArrowUpRight size={17} /></Link></section>
       <footer className="footer">
         <Link className="brand brand-logo" to="/" aria-label="Your Choice Tech home"><BrandLogo /></Link>

@@ -9,11 +9,15 @@ import { CourseDetailPage, LessonPage } from "./pages/DetailPages";
 import { AuthPage } from "./pages/AuthPage";
 import { CoursesPage } from "./pages/CoursesPage";
 import { HomePage } from "./pages/HomePage";
+import { AdminClassesPage } from "./pages/AdminClassesPage";
+import { ClassesPage, ClassDetailPage } from "./pages/UpcomingClassPages";
 
 function SiteLayout() {
   return <><Navbar /><Routes>
     <Route path="/" element={<HomePage />} />
     <Route path="/courses" element={<CoursesPage />} />
+    <Route path="/classes" element={<ClassesPage />} />
+    <Route path="/classes/:id" element={<ClassDetailPage />} />
     <Route path="/courses/:courseId" element={<CourseDetailPage />} />
     <Route path="/lessons/:lessonId" element={<LessonPage />} />
     <Route path="/login" element={<AuthPage />} />
@@ -24,6 +28,7 @@ function SiteLayout() {
     <Route element={<ProtectedRoute admin />}>
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/courses" element={<AdminCoursesPage />} />
+      <Route path="/admin/classes" element={<AdminClassesPage />} />
       <Route path="/admin/learning-resources" element={<AdminLearningResourcesPage />} />
       <Route path="/admin/students" element={<AdminStudentsPage />} />
       <Route path="/admin/*" element={<AdminPage />} />
