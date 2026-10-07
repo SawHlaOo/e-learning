@@ -24,7 +24,13 @@ export class LearningResourceController {
 
   create = async (_req: Request, res: Response) => {
     const input = validatedInput<z.infer<typeof createLearningResourceBodySchema>>(res, "body");
-    return success(res, await learningResourceService.create(input), 201);
+    // The validator guarantees that create requests contain an HTTP URL, but
+    // keep that contract explicit here instead of relying on Zod's inferred
+    // optional-property typing to match the service input type.
+    if (!input.url) {
+      throw new Error("Validated learning resource URL is missing");
+    }
+    return success(res, await learningResourceService.create({ ...input, url: input.url }), 201);
   };
 
   update = async (_req: Request, res: Response) => {
