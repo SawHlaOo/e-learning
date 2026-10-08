@@ -4,7 +4,12 @@ export function getClassStatus(
   upcomingClass: Pick<UpcomingClass, "status" | "startsAt" | "endsAt">,
   now = new Date(),
 ): UpcomingClassStatus {
-  if (upcomingClass.status === "DRAFT" || upcomingClass.status === "CANCELLED") {
+  if (
+    upcomingClass.status === "DRAFT"
+    || upcomingClass.status === "LIVE"
+    || upcomingClass.status === "COMPLETED"
+    || upcomingClass.status === "CANCELLED"
+  ) {
     return upcomingClass.status;
   }
   const recurring = upcomingClass as UpcomingClass;

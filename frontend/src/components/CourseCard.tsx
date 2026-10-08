@@ -8,7 +8,7 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
   return (
     <Link className="course-card" to={`/courses/${course.id}`}>
       <div className={`course-art ${colors[index % colors.length]}${course.thumbnail ? " has-course-image" : ""}`}>
-        {course.thumbnail && <img className="course-art-image" src={course.thumbnail} alt={`${course.title} thumbnail`} onError={(event) => {
+        {course.thumbnail && <img className="course-art-image" src={course.thumbnail} alt={`${course.title} thumbnail`} loading="lazy" decoding="async" onError={(event) => {
           event.currentTarget.hidden = true;
           event.currentTarget.parentElement?.classList.remove("has-course-image");
         }} />}

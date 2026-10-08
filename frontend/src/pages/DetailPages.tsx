@@ -4,11 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { courseService } from "../services/courseService";
 import { lessonService } from "../services/lessonService";
 import type { Course, Lesson } from "../types";
-
-function getTelegramEnrollUrl(value: string | undefined) {
-  if (!value) return null;
-  try { const url = new URL(value); return url.protocol === "https:" && ["t.me", "www.t.me", "telegram.me", "www.telegram.me"].includes(url.hostname) ? url.toString() : null; } catch { return null; }
-}
+import { getTelegramEnrollUrl } from "../utils/telegram";
 
 export function CourseDetailPage() {
   const { courseId = "" } = useParams();

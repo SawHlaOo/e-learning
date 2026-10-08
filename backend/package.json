@@ -12,7 +12,7 @@
     "prisma:migrate:dev": "node scripts/run-with-root-env.cjs prisma migrate dev --schema prisma/schema.prisma",
     "prisma:seed": "node scripts/run-with-root-env.cjs tsx prisma/seed.ts",
     "prisma:studio": "node scripts/run-with-root-env.cjs prisma studio --schema prisma/schema.prisma",
-    "test": "tsx --test tests/auth.service.test.ts tests/course.service.test.ts tests/learning.service.test.ts tests/pagination.test.ts tests/error-handler.test.ts tests/validate.middleware.test.ts tests/youtube-url.validator.test.ts tests/course.validator.test.ts"
+    "test": "tsx --test tests/learning-resource.validator.test.ts tests/upcoming-class.validator.test.ts tests/youtube-url.validator.test.ts tests/error-handler.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",

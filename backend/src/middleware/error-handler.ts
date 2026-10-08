@@ -44,6 +44,17 @@ function databaseError(error: Prisma.PrismaClientKnownRequestError): AppError | 
   }
 }
 
+function requestBodyError(error: unknown): AppError | undefined {
+  if (typeof error !== "object" || error === null || !("type" in error)) return undefined;
+  if (error.type === "entity.parse.failed") {
+    return new AppError("Request body must contain valid JSON", 400, "INVALID_JSON");
+  }
+  if (error.type === "entity.too.large") {
+    return new AppError("Request body is too large", 413, "PAYLOAD_TOO_LARGE");
+  }
+  return undefined;
+}
+
 export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
   if (error instanceof ZodError) {
     res.status(400).json({
@@ -51,6 +62,16 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
       message: "Validation failed",
       code: "VALIDATION_ERROR",
       errors: validationDetails(error),
+    });
+    return;
+  }
+
+  const bodyError = requestBodyError(error);
+  if (bodyError) {
+    res.status(bodyError.status).json({
+      success: false,
+      message: bodyError.message,
+      code: bodyError.code,
     });
     return;
   }

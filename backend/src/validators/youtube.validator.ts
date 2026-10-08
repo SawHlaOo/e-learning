@@ -20,6 +20,7 @@ export const createVideoBodySchema = videoFields.refine(
 function youtubeIdFromUrl(value: string) {
   try {
     const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
     if (url.hostname === "youtu.be" || url.hostname === "www.youtu.be") {
       return url.pathname.slice(1);
     }

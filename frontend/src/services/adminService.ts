@@ -27,10 +27,20 @@ export interface AdminStudent {
   _count: { enrollments: number; lessonProgress: number };
 }
 
+export interface AdminStudentPage {
+  items: AdminStudent[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
 
 export const adminService = {
   analytics: () => apiData<Analytics>(api.get("/admin/analytics")),
-  students: () => apiData<AdminStudent[]>(api.get("/admin/students")),
+  students: async (page = 1, limit = 20): Promise<AdminStudentPage> => {
+    const response = await api.get<{
+      data: AdminStudent[];
+      pagination: AdminStudentPage["pagination"];
+    }>("/admin/students", { params: { page, limit } });
+    return { items: response.data.data, pagination: response.data.pagination };
+  },
   courses: () => apiData<CourseAdminSummary[]>(api.get("/admin/courses?limit=100")),
   courseForEditing: (id: string) => apiData<ManagedCourse>(api.get(`/admin/courses/${id}`)),
   setStudentStatus: (id: string, isActive: boolean) =>

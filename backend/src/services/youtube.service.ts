@@ -70,6 +70,9 @@ export class YouTubeService {
     } catch {
       throw new ValidationError("A valid YouTube URL is required");
     }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new ValidationError("A valid HTTP or HTTPS YouTube URL is required");
+    }
     let id: string | null = null;
     if (parsed.hostname === "youtu.be" || parsed.hostname === "www.youtu.be") {
       id = parsed.pathname.slice(1);

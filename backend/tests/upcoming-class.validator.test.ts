@@ -53,7 +53,7 @@ test("class filters validate dates and sort direction", () => {
   assert.equal(upcomingClassListQuerySchema.safeParse({ sort: "random" }).success, false);
 });
 
-test("class status follows its schedule while preserving draft and cancelled states", () => {
+test("class status follows its schedule while preserving explicit draft, live, completed, and cancelled states", () => {
   const now = new Date("2026-11-01T09:30:00.000Z");
   const schedule = {
     startsAt: new Date("2026-11-01T09:00:00.000Z"),
@@ -76,5 +76,14 @@ test("class status follows its schedule while preserving draft and cancelled sta
     status: "UPCOMING",
   }, now), "COMPLETED");
   assert.equal(effectiveClassStatus({ ...schedule, status: "DRAFT" }, now), "DRAFT");
+  assert.equal(effectiveClassStatus({
+    ...schedule,
+    startsAt: new Date("2026-11-01T10:00:00.000Z"),
+    endsAt: new Date("2026-11-01T11:00:00.000Z"),
+    startTime: "10:00",
+    endTime: "11:00",
+    status: "LIVE",
+  }, now), "LIVE");
+  assert.equal(effectiveClassStatus({ ...schedule, status: "COMPLETED" }, now), "COMPLETED");
   assert.equal(effectiveClassStatus({ ...schedule, status: "CANCELLED" }, now), "CANCELLED");
 });

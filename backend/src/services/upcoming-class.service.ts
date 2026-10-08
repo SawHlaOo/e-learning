@@ -27,7 +27,12 @@ export function effectiveClassStatus(
   item: { status: UpcomingClassStatus; startsAt: Date; endsAt: Date; daysOfWeek?: string[]; startDate?: Date | null; endDate?: Date | null; startTime?: string | null; endTime?: string | null },
   now = new Date(),
 ) {
-  if (item.status === UpcomingClassStatus.DRAFT || item.status === UpcomingClassStatus.CANCELLED) {
+  if (
+    item.status === UpcomingClassStatus.DRAFT
+    || item.status === UpcomingClassStatus.LIVE
+    || item.status === UpcomingClassStatus.COMPLETED
+    || item.status === UpcomingClassStatus.CANCELLED
+  ) {
     return item.status;
   }
   if (item.startDate && item.endDate && item.startTime && item.endTime && item.daysOfWeek?.length) {

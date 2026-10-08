@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const youtubeUrlSchema = z.url().refine((value) => {
   const url = new URL(value);
+  if (url.protocol !== "http:" && url.protocol !== "https:") return false;
   const host = url.hostname.toLowerCase();
   if (host === "youtu.be" || host === "www.youtu.be") return url.pathname.length > 1;
   if (!["youtube.com", "www.youtube.com", "m.youtube.com"].includes(host)) return false;

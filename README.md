@@ -104,15 +104,7 @@ The Vite development server (`http://localhost:5173`) and preview server (`http:
 
 ### Development seed accounts
 
-The seed command creates these local-only accounts:
-
-| Role | Email | Default password |
-| --- | --- | --- |
-| Admin | `admin@example.com` | `Admin123!` |
-| Instructor | `instructor@example.com` | `Teach123!` |
-| Student | `student@example.com` | `Learn123!` |
-
-Override the default seed passwords with `SEED_ADMIN_PASSWORD`, `SEED_INSTRUCTOR_PASSWORD`, and `SEED_STUDENT_PASSWORD` before seeding if desired. These credentials are for development only. Change them before using any shared database; never rely on them in production. The seed refuses to run when `NODE_ENV=production`. It creates a beginner course, six modules, 30 lessons, 10 exercises, five projects, 10 cheat sheets, five unpublished sample video records, and achievement definitions.
+The development seed creates local-only admin, instructor, and student accounts. Before running it, set unique values of at least 12 characters for `SEED_ADMIN_PASSWORD`, `SEED_INSTRUCTOR_PASSWORD`, and `SEED_STUDENT_PASSWORD` in your local environment. The seed has no default passwords and refuses to run if any value is missing or too short. Never reuse these credentials on a shared or production database. The seed refuses to run when `NODE_ENV=production`. It creates a beginner course, six modules, 30 lessons, 10 exercises, five projects, 10 cheat sheets, five unpublished sample video records, and achievement definitions.
 
 ## Database and Prisma
 

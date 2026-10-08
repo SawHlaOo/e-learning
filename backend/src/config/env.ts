@@ -8,7 +8,7 @@ dotenv.config({
 });
 
 const optionalSecret = z.string().optional().refine(
-  (value) => !value || value.length >= 32,
+  (value) => !value || value.trim().length >= 32,
   "JWT_SECRET must contain at least 32 characters",
 );
 
@@ -34,6 +34,14 @@ const environmentSchema = z.object({
   AUTH_RATE_WINDOW_MS: integerSetting(900_000, 86_400_000),
   AUTH_RATE_LIMIT: integerSetting(30, 10_000),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).optional(),
+}).superRefine((value, context) => {
+  if (value.NODE_ENV === "production" && !value.JWT_SECRET) {
+    context.addIssue({
+      code: "custom",
+      path: ["JWT_SECRET"],
+      message: "JWT_SECRET is required in production",
+    });
+  }
 });
 
 const parsedEnvironment = environmentSchema.safeParse(process.env);

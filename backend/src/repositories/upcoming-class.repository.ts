@@ -89,7 +89,14 @@ export class UpcomingClassRepository {
 
   findClasses(page: PageInput) {
     const where: Prisma.UpcomingClassWhereInput = {
-      status: { in: [UpcomingClassStatus.LIVE, UpcomingClassStatus.COMPLETED, UpcomingClassStatus.CANCELLED] },
+      status: {
+        in: [
+          UpcomingClassStatus.UPCOMING,
+          UpcomingClassStatus.LIVE,
+          UpcomingClassStatus.COMPLETED,
+          UpcomingClassStatus.CANCELLED,
+        ],
+      },
     };
     return prisma.$transaction([
       prisma.upcomingClass.findMany({

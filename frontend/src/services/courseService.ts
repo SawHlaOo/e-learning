@@ -9,6 +9,13 @@ export const courseService = {
     }
     return result as Course[];
   },
+  listPage: async (page: number, limit = 20) => {
+    const response = await api.get<{
+      data: Course[];
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>("/courses", { params: { page, limit } });
+    return { items: response.data.data, pagination: response.data.pagination };
+  },
   get: (id: string) => apiData<Course>(api.get(`/courses/${id}`)),
   create: (input: CourseInput) => apiData<Course>(api.post("/courses", input)),
   update: (id: string, input: Partial<CourseInput>) => apiData<Course>(api.put(`/courses/${id}`, input)),

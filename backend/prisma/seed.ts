@@ -9,9 +9,16 @@ async function main() {
     throw new Error("The development seed is disabled in production.");
   }
 
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "Admin123!";
-  const instructorPassword = process.env.SEED_INSTRUCTOR_PASSWORD ?? "Teach123!";
-  const studentPassword = process.env.SEED_STUDENT_PASSWORD ?? "Learn123!";
+  const seedPassword = (name: string) => {
+    const password = process.env[name];
+    if (!password || password.length < 12) {
+      throw new Error(`${name} must be set to a unique password with at least 12 characters before seeding.`);
+    }
+    return password;
+  };
+  const adminPassword = seedPassword("SEED_ADMIN_PASSWORD");
+  const instructorPassword = seedPassword("SEED_INSTRUCTOR_PASSWORD");
+  const studentPassword = seedPassword("SEED_STUDENT_PASSWORD");
   const [adminHash, instructorHash, studentHash] = await Promise.all([
     bcrypt.hash(adminPassword, 12),
     bcrypt.hash(instructorPassword, 12),

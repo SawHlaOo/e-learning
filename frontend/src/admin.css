@@ -35,3 +35,10 @@
 :root[data-theme="dark"] .resource-admin-item{border-color:#344239}
 :root[data-theme="dark"] .resource-list-heading h2,:root[data-theme="dark"] .resource-admin-copy h3,:root[data-theme="dark"] .learning-resources-heading h2,:root[data-theme="dark"] .learning-resource-copy h3{color:#e5ece6}
 :root[data-theme="dark"] .learning-resource-copy p,:root[data-theme="dark"] .resource-admin-copy p{color:#aebbb0}
+.class-enroll-button{border:1px solid #cbdcbb;background:#e8f2df;color:#30452d;font-weight:700}
+.class-enroll-button:hover{background:#dceccc;color:#263c24}
+.class-enroll-button.enrollment-disabled,.class-enroll-button.enrollment-disabled:hover{opacity:1;cursor:not-allowed;pointer-events:none;transform:none}
+:root[data-theme="dark"] .class-enroll-button{border-color:#536b4a;background:#2d3e2a;color:#e5f0dd}
+.list-pagination{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px auto;color:var(--muted);font-size:12px}
+.list-pagination .button{padding:9px 13px;font-size:11px}
+.list-pagination .button:disabled{opacity:.5;cursor:not-allowed}

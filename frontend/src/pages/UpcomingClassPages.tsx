@@ -1,10 +1,11 @@
-import { ArrowLeft, ArrowRight, CalendarDays, ExternalLink, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, ExternalLink, Send, UserRound } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { UpcomingClassCard } from "../components/UpcomingClassCard";
 import { upcomingClassService } from "../services/upcomingClassService";
 import type { UpcomingClass } from "../types";
+import { getTelegramEnrollUrl } from "../utils/telegram";
 import { formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
 function BackLink({ fallback = "/upcoming-classes" }: { fallback?: string }) {
@@ -109,6 +110,7 @@ export function ClassDetailPage() {
 
   const status = getClassStatus(upcomingClass, now);
   const canJoin = status === "LIVE" && Boolean(upcomingClass.meetingUrl);
+  const telegramEnrollUrl = getTelegramEnrollUrl(import.meta.env.VITE_TELEGRAM_ENROLL_URL);
 
   return <main className="class-detail-page section">
     <BackLink fallback={basePath} />
@@ -123,6 +125,9 @@ export function ClassDetailPage() {
           <span><UserRound size={18} /><span><strong>{upcomingClass.instructorName}</strong><small>Instructor</small></span></span>
         </div>
         {upcomingClass.notes && <div className="class-detail-notes"><h2>Before you join</h2><p>{upcomingClass.notes}</p></div>}
+        {status === "UPCOMING" && (telegramEnrollUrl
+          ? <a className="button button-dark class-join-button class-enroll-button" href={telegramEnrollUrl} target="_blank" rel="noopener noreferrer">Go to Telegram to enroll <Send size={17} /></a>
+          : <button className="button button-dark class-join-button class-enroll-button enrollment-disabled" type="button" disabled>Go to Telegram to enroll <Send size={17} /></button>)}
         {status === "CANCELLED" && <p className="class-cancelled-message" role="status">This class has been cancelled.</p>}
         {status === "COMPLETED" && <p className="class-completed-message" role="status">This class has ended.</p>}
         {status === "LIVE" && !upcomingClass.meetingUrl && <p className="class-completed-message" role="status">The instructor hasn’t added a meeting link yet.</p>}
