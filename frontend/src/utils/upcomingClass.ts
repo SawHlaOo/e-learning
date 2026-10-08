@@ -1,5 +1,9 @@
 import type { UpcomingClass, UpcomingClassStatus } from "../types";
 
+export function classStatusLabel(status: UpcomingClassStatus) {
+  return status === "LIVE" ? "Ongoing" : status.toLowerCase();
+}
+
 export function getClassStatus(
   upcomingClass: Pick<UpcomingClass, "status" | "startsAt" | "endsAt">,
   now = new Date(),

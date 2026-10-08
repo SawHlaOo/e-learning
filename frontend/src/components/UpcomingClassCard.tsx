@@ -2,7 +2,7 @@ import { ArrowRight, CalendarDays, Send, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { UpcomingClass } from "../types";
 import { getTelegramEnrollUrl } from "../utils/telegram";
-import { formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
+import { classStatusLabel, formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
 export function UpcomingClassCard({ upcomingClass, detailPath = "/classes" }: { upcomingClass: UpcomingClass; detailPath?: string }) {
   const status = getClassStatus(upcomingClass);
@@ -14,7 +14,7 @@ export function UpcomingClassCard({ upcomingClass, detailPath = "/classes" }: { 
         : <div className="upcoming-class-image upcoming-class-image-placeholder" aria-hidden="true"><CalendarDays size={28} /></div>}
       <div className="upcoming-class-card-content">
         <div className="upcoming-class-card-heading">
-          <span className={`upcoming-class-status status-${status.toLowerCase()}`}>{status.toLowerCase()}</span>
+          <span className={`upcoming-class-status status-${status.toLowerCase()}`}>{classStatusLabel(status)}</span>
           {upcomingClass.course && <span className="upcoming-class-category">{upcomingClass.course.title}</span>}
         </div>
         <h3>{upcomingClass.title}</h3>

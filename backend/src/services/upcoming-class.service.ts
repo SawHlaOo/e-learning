@@ -89,11 +89,7 @@ export class UpcomingClassService {
       : await this.classes.findPublicById(id);
     if (!item) throw new NotFoundError("Class not found");
     if (admin) return item;
-    const result = present(item, now);
-    if (!admin && result && result.status !== UpcomingClassStatus.LIVE) {
-      return { ...result, meetingUrl: null };
-    }
-    return result;
+    return present(item, now);
   }
 
   async create(input: UpcomingClassInput) {

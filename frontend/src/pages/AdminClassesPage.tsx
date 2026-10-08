@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { adminService, type CourseAdminSummary } from "../services/adminService";
 import { upcomingClassService, type UpcomingClassFilters, type UpcomingClassInput } from "../services/upcomingClassService";
 import type { UpcomingClass, UpcomingClassStatus } from "../types";
-import { formatClassSchedule } from "../utils/upcomingClass";
+import { classStatusLabel, formatClassSchedule } from "../utils/upcomingClass";
 
 type ClassDraft = UpcomingClassInput & { startDate: string; endDate: string };
 type ClassField = keyof ClassDraft;
@@ -264,7 +264,7 @@ export function AdminClassesPage() {
     <section className="admin-editor-card class-filter-card" aria-label="Filter classes">
       <div className="class-filter-grid">
         <label className="admin-field">Search<input value={search} onChange={(event) => { setPage(1); setSearch(event.target.value); }} placeholder="Class, description, instructor" /></label>
-        <label className="admin-field">Status<select value={statusFilter} onChange={(event) => { setPage(1); setStatusFilter(event.target.value as UpcomingClassStatus | ""); }}><option value="">All statuses</option>{statuses.map((status) => <option key={status}>{status}</option>)}</select></label>
+        <label className="admin-field">Status<select value={statusFilter} onChange={(event) => { setPage(1); setStatusFilter(event.target.value as UpcomingClassStatus | ""); }}><option value="">All statuses</option>{statuses.map((status) => <option key={status} value={status}>{classStatusLabel(status)}</option>)}</select></label>
         <label className="admin-field">From date<input type="date" value={from} onChange={(event) => { setPage(1); setFrom(event.target.value); }} /></label>
         <label className="admin-field">To date<input type="date" value={to} onChange={(event) => { setPage(1); setTo(event.target.value); }} /></label>
         <label className="admin-field">Sort by date<select value={sort} onChange={(event) => setSort(event.target.value as "asc" | "desc")}><option value="asc">Earliest first</option><option value="desc">Latest first</option></select></label>
@@ -274,7 +274,7 @@ export function AdminClassesPage() {
       <section className="admin-course-list">
         <div className="admin-course-list-heading"><h2>Classes</h2><button className="button button-dark" onClick={startNew}><Plus size={16} /> New class</button></div>
         {loading ? <div className="page-state">Loading classes…</div> : classes.length ? classes.map((item) => <article className="upcoming-admin-row" key={item.id}>
-          <div><span className={`upcoming-class-status status-${item.status.toLowerCase()}`}>{item.status.toLowerCase()}</span><strong>{item.title}</strong><small><CalendarDays size={13} /> {formatClassSchedule(item.daysOfWeek, item.startDate, item.endDate, item.startTime, item.endTime)}</small></div>
+          <div><span className={`upcoming-class-status status-${item.status.toLowerCase()}`}>{classStatusLabel(item.status)}</span><strong>{item.title}</strong><small><CalendarDays size={13} /> {formatClassSchedule(item.daysOfWeek, item.startDate, item.endDate, item.startTime, item.endTime)}</small></div>
           <div className="admin-row-actions"><button className="icon-action" aria-label={`Edit ${item.title}`} onClick={() => editClass(item)}><Pencil size={15} /></button><button className="icon-action danger-action" aria-label={`Delete ${item.title}`} onClick={() => void removeClass(item)}><Trash2 size={15} /></button></div>
         </article>) : <p className="muted">No classes match these filters.</p>}
         <div className="class-pagination"><button className="button button-light" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Previous</button><span>Page {page} of {totalPages}</span><button className="button button-light" disabled={page >= totalPages} onClick={() => setPage((value) => value + 1)}>Next</button></div>
@@ -296,7 +296,7 @@ export function AdminClassesPage() {
           <label className="admin-field">From time<input required type="time" aria-invalid={ariaInvalid("startTime")} value={draft.startTime} onChange={(event) => change("startTime", event.target.value)} />{fieldError("startTime")}</label>
           <label className="admin-field">To time<input required type="time" aria-invalid={ariaInvalid("endTime")} value={draft.endTime} onChange={(event) => change("endTime", event.target.value)} />{fieldError("endTime")}</label>
           <label className="admin-field">Related course<select value={draft.courseId ?? ""} onChange={(event) => change("courseId", event.target.value)}><option value="">No course</option>{courses.map((course) => <option key={course.id} value={course.id}>{course.title}</option>)}</select></label>
-          <label className="admin-field">Status<select value={draft.status} onChange={(event) => change("status", event.target.value as UpcomingClassStatus)}>{statuses.map((status) => <option key={status}>{status}</option>)}</select></label>
+          <label className="admin-field">Status<select value={draft.status} onChange={(event) => change("status", event.target.value as UpcomingClassStatus)}>{statuses.map((status) => <option key={status} value={status}>{classStatusLabel(status)}</option>)}</select></label>
           <label className="admin-field">Maximum participants<input type="number" min="1" aria-invalid={ariaInvalid("maxParticipants")} value={draft.maxParticipants ?? ""} onChange={(event) => change("maxParticipants", event.target.value ? Number(event.target.value) : null)} />{fieldError("maxParticipants")}</label>
           <label className="admin-field full-field">Thumbnail URL<input type="url" aria-invalid={ariaInvalid("thumbnail")} value={draft.thumbnail ?? ""} onChange={(event) => change("thumbnail", event.target.value)} />{fieldError("thumbnail")}</label>
           <label className="admin-field">Meeting platform<input maxLength={80} aria-invalid={ariaInvalid("meetingPlatform")} value={draft.meetingPlatform ?? ""} onChange={(event) => change("meetingPlatform", event.target.value)} placeholder="Zoom, Google Meet…" />{fieldError("meetingPlatform")}</label>

@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CalendarDays, ExternalLink, Send, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, ExternalLink, Send, UserRound, UsersRound, Video } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -6,7 +6,7 @@ import { UpcomingClassCard } from "../components/UpcomingClassCard";
 import { upcomingClassService } from "../services/upcomingClassService";
 import type { UpcomingClass } from "../types";
 import { getTelegramEnrollUrl } from "../utils/telegram";
-import { formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
+import { classStatusLabel, formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
 function BackLink({ fallback = "/upcoming-classes" }: { fallback?: string }) {
   const navigate = useNavigate();
@@ -117,12 +117,14 @@ export function ClassDetailPage() {
     <article className="class-detail-card">
       {upcomingClass.thumbnail && <img className="class-detail-image" src={upcomingClass.thumbnail} alt="" />}
       <div className="class-detail-content">
-        <div className="class-detail-kicker"><span className={`upcoming-class-status status-${status.toLowerCase()}`}>{status.toLowerCase()}</span>{upcomingClass.course && <span>{upcomingClass.course.title}</span>}</div>
+        <div className="class-detail-kicker"><span className={`upcoming-class-status status-${status.toLowerCase()}`}>{classStatusLabel(status)}</span>{upcomingClass.course && <span>{upcomingClass.course.title}</span>}</div>
         <h1>{upcomingClass.title}</h1>
         <p className="class-detail-description">{upcomingClass.description}</p>
         <div className="class-detail-meta">
           <span><CalendarDays size={18} /><span><strong>Weekly schedule</strong><small>{formatClassSchedule(upcomingClass.daysOfWeek, upcomingClass.startDate, upcomingClass.endDate, upcomingClass.startTime, upcomingClass.endTime)}</small></span></span>
           <span><UserRound size={18} /><span><strong>{upcomingClass.instructorName}</strong><small>Instructor</small></span></span>
+          {upcomingClass.maxParticipants != null && <span><UsersRound size={18} /><span><strong>Maximum participants</strong><small>{upcomingClass.maxParticipants}</small></span></span>}
+          {(upcomingClass.meetingPlatform || upcomingClass.meetingUrl) && <span><Video size={18} /><span><strong>Meeting platform</strong><small>{upcomingClass.meetingPlatform || "Online meeting"}</small>{upcomingClass.meetingUrl && <a className="class-meeting-link" href={upcomingClass.meetingUrl} target="_blank" rel="noopener noreferrer">Open meeting link <ExternalLink size={13} /></a>}</span></span>}
         </div>
         {upcomingClass.notes && <div className="class-detail-notes"><h2>Before you join</h2><p>{upcomingClass.notes}</p></div>}
         {status === "UPCOMING" && (telegramEnrollUrl

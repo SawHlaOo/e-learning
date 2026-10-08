@@ -40,6 +40,8 @@
 .class-enroll-button.enrollment-disabled,.class-enroll-button.enrollment-disabled:hover{opacity:1;cursor:not-allowed;pointer-events:none;transform:none}
 :root[data-theme="dark"] .class-enroll-button{border-color:#536b4a;background:#2d3e2a;color:#e5f0dd}
 .class-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.class-meeting-link{display:inline-flex;align-items:center;gap:5px;width:max-content;max-width:100%;margin-top:3px;color:#385132;font-size:11px;font-weight:650;text-decoration:underline;overflow-wrap:anywhere}
+:root[data-theme="dark"] .class-meeting-link{color:#b9ee78}
 .list-pagination{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px auto;color:var(--muted);font-size:12px}
 .list-pagination .button{padding:9px 13px;font-size:11px}
 .list-pagination .button:disabled{opacity:.5;cursor:not-allowed}
