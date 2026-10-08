@@ -41,6 +41,14 @@ test("upcoming class rejects invalid time ranges and participant limits", () => 
   }).success, false);
 });
 
+test("upcoming class validates optional MMK fees and supports clearing a fee", () => {
+  assert.equal(createUpcomingClassBodySchema.safeParse({ ...validClass, feeAmount: 0 }).success, true);
+  assert.equal(createUpcomingClassBodySchema.safeParse({ ...validClass, feeAmount: 25000 }).success, true);
+  assert.equal(createUpcomingClassBodySchema.safeParse({ ...validClass, feeAmount: 1.5 }).success, false);
+  assert.equal(createUpcomingClassBodySchema.safeParse({ ...validClass, feeAmount: -1 }).success, false);
+  assert.equal(updateUpcomingClassBodySchema.safeParse({ feeAmount: null }).success, true);
+});
+
 test("upcoming class updates require a field and accept valid status changes", () => {
   assert.equal(updateUpcomingClassBodySchema.safeParse({}).success, false);
   assert.equal(updateUpcomingClassBodySchema.safeParse({ status: "CANCELLED" }).success, true);

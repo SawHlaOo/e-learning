@@ -1,8 +1,8 @@
-import { ArrowRight, CalendarDays, Send, UserRound } from "lucide-react";
+import { ArrowRight, CalendarDays, Coins, Send, UserRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { UpcomingClass } from "../types";
 import { getTelegramEnrollUrl } from "../utils/telegram";
-import { classStatusLabel, formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
+import { classStatusLabel, formatClassFee, formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
 export function UpcomingClassCard({ upcomingClass, detailPath = "/classes" }: { upcomingClass: UpcomingClass; detailPath?: string }) {
   const status = getClassStatus(upcomingClass);
@@ -22,6 +22,7 @@ export function UpcomingClassCard({ upcomingClass, detailPath = "/classes" }: { 
         <div className="upcoming-class-meta">
           <span><CalendarDays size={15} />{formatClassSchedule(upcomingClass.daysOfWeek, upcomingClass.startDate, upcomingClass.endDate, upcomingClass.startTime, upcomingClass.endTime)}</span>
           <span><UserRound size={15} />{upcomingClass.instructorName || "Instructor to be announced"}</span>
+          {upcomingClass.feeAmount != null && <span><Coins size={15} />{formatClassFee(upcomingClass.feeAmount)}</span>}
         </div>
         <div className="class-card-actions">
           <Link className="button button-dark upcoming-class-view" to={`${detailPath}/${upcomingClass.id}`}>View details <ArrowRight size={16} /></Link>

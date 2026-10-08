@@ -37,6 +37,7 @@ const createFields = {
   meetingUrl: optionalHttpUrlSchema,
   meetingPlatform: z.string().trim().max(80).nullable().optional(),
   maxParticipants: z.number().int().min(1).max(100000).nullable().optional(),
+  feeAmount: z.number().int().min(0).max(1_000_000_000).nullable().optional(),
   notes: z.string().trim().max(10000).nullable().optional(),
   status: upcomingClassStatusSchema.optional(),
 };

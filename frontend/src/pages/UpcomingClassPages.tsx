@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CalendarDays, ExternalLink, Send, UserRound, UsersRound, Video } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Coins, ExternalLink, Send, UserRound, UsersRound, Video } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -6,7 +6,7 @@ import { UpcomingClassCard } from "../components/UpcomingClassCard";
 import { upcomingClassService } from "../services/upcomingClassService";
 import type { UpcomingClass } from "../types";
 import { getTelegramEnrollUrl } from "../utils/telegram";
-import { classStatusLabel, formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
+import { classStatusLabel, formatClassFee, formatClassSchedule, getClassStatus } from "../utils/upcomingClass";
 
 function BackLink({ fallback = "/upcoming-classes" }: { fallback?: string }) {
   const navigate = useNavigate();
@@ -123,6 +123,7 @@ export function ClassDetailPage() {
         <div className="class-detail-meta">
           <span><CalendarDays size={18} /><span><strong>Weekly schedule</strong><small>{formatClassSchedule(upcomingClass.daysOfWeek, upcomingClass.startDate, upcomingClass.endDate, upcomingClass.startTime, upcomingClass.endTime)}</small></span></span>
           <span><UserRound size={18} /><span><strong>{upcomingClass.instructorName}</strong><small>Instructor</small></span></span>
+          {upcomingClass.feeAmount != null && <span><Coins size={18} /><span><strong>Class fee</strong><small>{formatClassFee(upcomingClass.feeAmount)}</small></span></span>}
           {upcomingClass.maxParticipants != null && <span><UsersRound size={18} /><span><strong>Maximum participants</strong><small>{upcomingClass.maxParticipants}</small></span></span>}
           {(upcomingClass.meetingPlatform || upcomingClass.meetingUrl) && <span><Video size={18} /><span><strong>Meeting platform</strong><small>{upcomingClass.meetingPlatform || "Online meeting"}</small>{upcomingClass.meetingUrl && <a className="class-meeting-link" href={upcomingClass.meetingUrl} target="_blank" rel="noopener noreferrer">Open meeting link <ExternalLink size={13} /></a>}</span></span>}
         </div>

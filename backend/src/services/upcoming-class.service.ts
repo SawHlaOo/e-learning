@@ -19,6 +19,7 @@ export interface UpcomingClassInput {
   meetingUrl?: string | null;
   meetingPlatform?: string | null;
   maxParticipants?: number | null;
+  feeAmount?: number | null;
   notes?: string | null;
   status?: UpcomingClassStatus;
 }
@@ -114,6 +115,7 @@ export class UpcomingClassService {
       meetingUrl: input.meetingUrl?.trim() || null,
       meetingPlatform: input.meetingPlatform?.trim() || null,
       maxParticipants: input.maxParticipants ?? null,
+      feeAmount: input.feeAmount ?? null,
       notes: input.notes?.trim() || null,
       status: input.status ?? UpcomingClassStatus.DRAFT,
     };
@@ -156,6 +158,7 @@ export class UpcomingClassService {
       ...(input.meetingUrl?.trim() ? { meetingUrl: input.meetingUrl.trim() } : {}),
       ...(input.meetingPlatform?.trim() ? { meetingPlatform: input.meetingPlatform.trim() } : {}),
       ...(input.maxParticipants !== undefined && input.maxParticipants !== null ? { maxParticipants: input.maxParticipants } : {}),
+      ...(input.feeAmount !== undefined ? { feeAmount: input.feeAmount } : {}),
       ...(input.notes?.trim() ? { notes: input.notes.trim() } : {}),
       ...(input.status !== undefined ? { status: input.status } : {}),
     };

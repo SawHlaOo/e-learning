@@ -121,6 +121,7 @@ model UpcomingClass {
   meetingUrl        String?
   meetingPlatform   String?
   maxParticipants   Int?
+  feeAmount         Int?
   notes             String?              @db.Text
   status            UpcomingClassStatus  @default(DRAFT)
   instructor        User?                @relation("ClassInstructor", fields: [instructorId], references: [id], onDelete: Restrict)

@@ -99,6 +99,7 @@ export interface UpcomingClass {
   meetingUrl: string | null;
   meetingPlatform: string | null;
   maxParticipants: number | null;
+  feeAmount: number | null;
   notes?: string | null;
   status: UpcomingClassStatus;
   instructor: { id: string; name: string } | null;

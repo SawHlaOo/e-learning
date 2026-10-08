@@ -6,13 +6,13 @@ import { Link } from "react-router-dom";
 import { adminService, type CourseAdminSummary } from "../services/adminService";
 import { upcomingClassService, type UpcomingClassFilters, type UpcomingClassInput } from "../services/upcomingClassService";
 import type { UpcomingClass, UpcomingClassStatus } from "../types";
-import { classStatusLabel, formatClassSchedule } from "../utils/upcomingClass";
+import { classStatusLabel, formatClassFee, formatClassSchedule } from "../utils/upcomingClass";
 
 type ClassDraft = UpcomingClassInput & { startDate: string; endDate: string };
 type ClassField = keyof ClassDraft;
 type FieldErrors = Partial<Record<ClassField, string>>;
 const weekDays = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-const optionalFields: ClassField[] = ["instructorId", "thumbnail", "courseId", "meetingUrl", "meetingPlatform", "maxParticipants", "notes"];
+const optionalFields: ClassField[] = ["instructorId", "thumbnail", "courseId", "meetingUrl", "meetingPlatform", "maxParticipants", "feeAmount", "notes"];
 
 const blankDraft: ClassDraft = {
   title: "",
@@ -29,6 +29,7 @@ const blankDraft: ClassDraft = {
   meetingUrl: "",
   meetingPlatform: "",
   maxParticipants: null,
+  feeAmount: null,
   notes: "",
   status: "DRAFT",
 };
@@ -61,6 +62,9 @@ function validateDraft(draft: ClassDraft): FieldErrors {
   }
   if (draft.maxParticipants != null && (!Number.isInteger(draft.maxParticipants) || draft.maxParticipants < 1)) {
     errors.maxParticipants = "Enter a whole number greater than zero.";
+  }
+  if (draft.feeAmount != null && (!Number.isInteger(draft.feeAmount) || draft.feeAmount < 0 || draft.feeAmount > 1_000_000_000)) {
+    errors.feeAmount = "Enter a whole MMK amount between 0 and 1,000,000,000.";
   }
   if (draft.meetingPlatform && draft.meetingPlatform.length > 80) errors.meetingPlatform = "Use 80 characters or fewer.";
   if (draft.notes && draft.notes.length > 10000) errors.notes = "Use 10,000 characters or fewer.";
@@ -98,6 +102,7 @@ function fromClass(item: UpcomingClass): ClassDraft {
     meetingUrl: item.meetingUrl ?? "",
     meetingPlatform: item.meetingPlatform ?? "",
     maxParticipants: item.maxParticipants,
+    feeAmount: item.feeAmount,
     notes: item.notes ?? "",
     status: item.status,
   };
@@ -211,7 +216,7 @@ export function AdminClassesPage() {
           const value = input[key];
           const original = originalDraft.current[key];
           if (JSON.stringify(value) === JSON.stringify(original)) continue;
-          if (optionalFields.includes(key) && (value === null || value === "")) continue;
+          if (optionalFields.includes(key) && key !== "feeAmount" && (value === null || value === "")) continue;
           Object.assign(changed, { [key]: value });
         }
         if (Object.keys(changed).length) await upcomingClassService.update(editingId, changed);
@@ -274,7 +279,7 @@ export function AdminClassesPage() {
       <section className="admin-course-list">
         <div className="admin-course-list-heading"><h2>Classes</h2><button className="button button-dark" onClick={startNew}><Plus size={16} /> New class</button></div>
         {loading ? <div className="page-state">Loading classes…</div> : classes.length ? classes.map((item) => <article className="upcoming-admin-row" key={item.id}>
-          <div><span className={`upcoming-class-status status-${item.status.toLowerCase()}`}>{classStatusLabel(item.status)}</span><strong>{item.title}</strong><small><CalendarDays size={13} /> {formatClassSchedule(item.daysOfWeek, item.startDate, item.endDate, item.startTime, item.endTime)}</small></div>
+          <div><span className={`upcoming-class-status status-${item.status.toLowerCase()}`}>{classStatusLabel(item.status)}</span><strong>{item.title}</strong><small><CalendarDays size={13} /> {formatClassSchedule(item.daysOfWeek, item.startDate, item.endDate, item.startTime, item.endTime)}</small><small>{item.feeAmount == null ? "Fee not set" : formatClassFee(item.feeAmount)}</small></div>
           <div className="admin-row-actions"><button className="icon-action" aria-label={`Edit ${item.title}`} onClick={() => editClass(item)}><Pencil size={15} /></button><button className="icon-action danger-action" aria-label={`Delete ${item.title}`} onClick={() => void removeClass(item)}><Trash2 size={15} /></button></div>
         </article>) : <p className="muted">No classes match these filters.</p>}
         <div className="class-pagination"><button className="button button-light" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Previous</button><span>Page {page} of {totalPages}</span><button className="button button-light" disabled={page >= totalPages} onClick={() => setPage((value) => value + 1)}>Next</button></div>
@@ -298,6 +303,7 @@ export function AdminClassesPage() {
           <label className="admin-field">Related course<select value={draft.courseId ?? ""} onChange={(event) => change("courseId", event.target.value)}><option value="">No course</option>{courses.map((course) => <option key={course.id} value={course.id}>{course.title}</option>)}</select></label>
           <label className="admin-field">Status<select value={draft.status} onChange={(event) => change("status", event.target.value as UpcomingClassStatus)}>{statuses.map((status) => <option key={status} value={status}>{classStatusLabel(status)}</option>)}</select></label>
           <label className="admin-field">Maximum participants<input type="number" min="1" aria-invalid={ariaInvalid("maxParticipants")} value={draft.maxParticipants ?? ""} onChange={(event) => change("maxParticipants", event.target.value ? Number(event.target.value) : null)} />{fieldError("maxParticipants")}</label>
+          <label className="admin-field">Class fee (MMK)<input type="number" min="0" max="1000000000" step="1" aria-invalid={ariaInvalid("feeAmount")} value={draft.feeAmount ?? ""} onChange={(event) => change("feeAmount", event.target.value ? Number(event.target.value) : null)} /><small>Leave blank if not set; enter 0 for free.</small>{fieldError("feeAmount")}</label>
           <label className="admin-field full-field">Thumbnail URL<input type="url" aria-invalid={ariaInvalid("thumbnail")} value={draft.thumbnail ?? ""} onChange={(event) => change("thumbnail", event.target.value)} />{fieldError("thumbnail")}</label>
           <label className="admin-field">Meeting platform<input maxLength={80} aria-invalid={ariaInvalid("meetingPlatform")} value={draft.meetingPlatform ?? ""} onChange={(event) => change("meetingPlatform", event.target.value)} placeholder="Zoom, Google Meet…" />{fieldError("meetingPlatform")}</label>
           <label className="admin-field">Meeting URL<input type="url" aria-invalid={ariaInvalid("meetingUrl")} value={draft.meetingUrl ?? ""} onChange={(event) => change("meetingUrl", event.target.value)} />{fieldError("meetingUrl")}</label>

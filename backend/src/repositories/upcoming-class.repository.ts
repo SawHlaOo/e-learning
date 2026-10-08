@@ -28,6 +28,7 @@ const classSelection = {
   meetingUrl: true,
   meetingPlatform: true,
   maxParticipants: true,
+  feeAmount: true,
   notes: true,
   status: true,
   createdAt: true,
