@@ -31,7 +31,7 @@
 .learning-board-header strong{font-size:17px;letter-spacing:-.45px}
 .learning-board-sparkle{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#eef4ff;color:#2446e8}
 
-.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font-size:12px;font-weight:600}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink)}
 .theme-toggle:hover{background:var(--paper)}
 .enrollment-disabled,.enrollment-disabled:hover{pointer-events:none;cursor:not-allowed;opacity:.58;transform:none}
 

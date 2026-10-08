@@ -48,7 +48,6 @@ export function Navbar() {
           <button className="menu-toggle" aria-label="Toggle navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
           <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${darkMode ? "light" : "dark"} mode`} title={`Switch to ${darkMode ? "light" : "dark"} mode`}>
             {darkMode ? <Sun size={17} /> : <Moon size={17} />}
-            <span>{darkMode ? "Light mode" : "Dark mode"}</span>
           </button>
         </div>
       </div>
