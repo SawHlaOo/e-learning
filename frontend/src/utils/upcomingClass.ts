@@ -59,8 +59,41 @@ export function toLocalDateTime(value: string) {
 }
 
 export function formatClassSchedule(days: string[], startDate: string | null, endDate: string | null, startTime: string | null, endTime: string | null) {
-  const labels: Record<string, string> = { SUNDAY: "Sun", MONDAY: "Mon", TUESDAY: "Tue", WEDNESDAY: "Wed", THURSDAY: "Thu", FRIDAY: "Fri", SATURDAY: "Sat" };
+  const labels: Record<string, string> = {
+    SUNDAY: "Sunday",
+    MONDAY: "Monday",
+    TUESDAY: "Tuesday",
+    WEDNESDAY: "Wednesday",
+    THURSDAY: "Thursday",
+    FRIDAY: "Friday",
+    SATURDAY: "Saturday",
+  };
   const dayText = days.map((day) => labels[day] ?? day).join(", ");
   if (!startDate || !endDate || !startTime || !endTime) return `${dayText} · Schedule unavailable`;
-  return `${dayText} · ${startDate.slice(0, 10)} to ${endDate.slice(0, 10)} · ${startTime}–${endTime}`;
+
+  const timeRange = `${formatScheduleTime(startTime)} – ${formatScheduleTime(endTime)}`;
+  const duration = `${formatScheduleDate(startDate)} – ${formatScheduleDate(endDate)}`;
+  return `${dayText}, ${timeRange} · Duration: ${duration}`;
+}
+
+function formatScheduleDate(value: string) {
+  const datePart = value.slice(0, 10);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(datePart);
+  if (!match) return value;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+}
+
+function formatScheduleTime(value: string) {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value);
+  if (!match) return value;
+  const hour = Number(match[1]);
+  const minute = match[2];
+  const period = hour < 12 ? "AM" : "PM";
+  const displayHour = hour % 12 || 12;
+  return `${displayHour}:${minute} ${period}`;
 }

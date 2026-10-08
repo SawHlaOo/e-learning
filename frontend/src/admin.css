@@ -39,6 +39,7 @@
 .class-enroll-button:hover{background:#dceccc;color:#263c24}
 .class-enroll-button.enrollment-disabled,.class-enroll-button.enrollment-disabled:hover{opacity:1;cursor:not-allowed;pointer-events:none;transform:none}
 :root[data-theme="dark"] .class-enroll-button{border-color:#536b4a;background:#2d3e2a;color:#e5f0dd}
+.class-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .list-pagination{display:flex;align-items:center;justify-content:center;gap:16px;margin:24px auto;color:var(--muted);font-size:12px}
 .list-pagination .button{padding:9px 13px;font-size:11px}
 .list-pagination .button:disabled{opacity:.5;cursor:not-allowed}

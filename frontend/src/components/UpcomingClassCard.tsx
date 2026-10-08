@@ -23,10 +23,12 @@ export function UpcomingClassCard({ upcomingClass, detailPath = "/classes" }: { 
           <span><CalendarDays size={15} />{formatClassSchedule(upcomingClass.daysOfWeek, upcomingClass.startDate, upcomingClass.endDate, upcomingClass.startTime, upcomingClass.endTime)}</span>
           <span><UserRound size={15} />{upcomingClass.instructorName || "Instructor to be announced"}</span>
         </div>
-        <Link className="button button-dark upcoming-class-view" to={`${detailPath}/${upcomingClass.id}`}>View details <ArrowRight size={16} /></Link>
-        {status === "UPCOMING" && (telegramEnrollUrl
-          ? <a className="button button-light upcoming-class-view class-enroll-button" href={telegramEnrollUrl} target="_blank" rel="noopener noreferrer">Go to Telegram to enroll <Send size={16} /></a>
-          : <button className="button button-light upcoming-class-view class-enroll-button enrollment-disabled" type="button" disabled>Go to Telegram to enroll <Send size={16} /></button>)}
+        <div className="class-card-actions">
+          <Link className="button button-dark upcoming-class-view" to={`${detailPath}/${upcomingClass.id}`}>View details <ArrowRight size={16} /></Link>
+          {status === "UPCOMING" && (telegramEnrollUrl
+            ? <a className="button button-light upcoming-class-view class-enroll-button" href={telegramEnrollUrl} target="_blank" rel="noopener noreferrer">Go to Telegram to enroll <Send size={16} /></a>
+            : <button className="button button-light upcoming-class-view class-enroll-button enrollment-disabled" type="button" disabled>Go to Telegram to enroll <Send size={16} /></button>)}
+        </div>
       </div>
     </article>
   );
